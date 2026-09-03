@@ -30,7 +30,7 @@ release = [
   "build==1.6.0",
   "pip-audit==2.10.1",
   "pip-licenses==5.5.5",
-  "ruff==0.12.12",
+  "ruff==0.16.5",
 ]
 
 [project.scripts]
