@@ -22,7 +22,7 @@ def verify_artifact(artifact: Path, label: str) -> None:
         python = environment / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
         cli = environment / ("Scripts/legends-sa3.exe" if os.name == "nt" else "bin/legends-sa3")
         run([str(python), "-m", "pip", "install", "--disable-pip-version-check", str(artifact)])
-        run([str(python), "-c", "import legends_sa3; assert legends_sa3.__version__ == '0.4.0'"])
+        run([str(python), "-c", "import legends_sa3; assert legends_sa3.__version__ == '0.4.1'"])
         run([str(cli), "--version"])
         run([str(cli), "skill", "validate"])
         install_target = root / "skills"
@@ -77,10 +77,10 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Install and smoke-test built wheel and source artifacts.")
     parser.add_argument("--dist", type=Path, default=Path("dist"))
     args = parser.parse_args()
-    wheels = sorted(args.dist.glob("legends_stable_audio_3-0.4.0-*.whl"))
-    sdists = sorted(args.dist.glob("legends_stable_audio_3-0.4.0.tar.gz"))
+    wheels = sorted(args.dist.glob("legends_stable_audio_3-0.4.1-*.whl"))
+    sdists = sorted(args.dist.glob("legends_stable_audio_3-0.4.1.tar.gz"))
     if len(wheels) != 1 or len(sdists) != 1:
-        raise SystemExit("Expected exactly one v0.4.0 wheel and one v0.4.0 sdist")
+        raise SystemExit("Expected exactly one v0.4.1 wheel and one v0.4.1 sdist")
     verify_artifact(wheels[0].resolve(), "wheel")
     verify_artifact(sdists[0].resolve(), "sdist")
     return 0

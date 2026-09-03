@@ -11,7 +11,7 @@ from pathlib import Path
 from sync_skill_adapters import FORBIDDEN_RELEASE_SUFFIXES, git_release_files
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "0.4.0"
+VERSION = "0.4.1"
 PUBLIC_URL = "https://github.com/avalonreset/legends-stable-audio-3"
 APACHE_LICENSE_SHA256 = "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
 REQUIRED_FILES = (
@@ -40,6 +40,9 @@ ACTIVE_STALE_PATTERNS = {
     "source license pending": "superseded license gate",
     "license selection pending": "superseded license gate",
     "MIT or Apache-2.0": "superseded license selection",
+    "the public repository does not exist": "stale pre-publication state",
+    "no public release is being created": "stale pre-publication state",
+    "repository is in public-release preparation": "stale pre-publication state",
 }
 HISTORICAL_RELEASES = {
     Path("docs/releases/v0.1.0.md"),
@@ -77,7 +80,7 @@ def validate_tree(root: Path = ROOT) -> list[str]:
         "src/legends_sa3/__init__.py": f'__version__ = "{VERSION}"',
         "gemini-extension.json": f'"version": "{VERSION}"',
         "CITATION.cff": f'version: "{VERSION}"',
-        "docs/releases/v0.4.0.md": "# v0.4.0 - First Public Release",
+        "docs/releases/v0.4.1.md": "# v0.4.1 - Public Onboarding Polish",
     }
     for relative, marker in version_surfaces.items():
         path = root / relative
@@ -225,11 +228,13 @@ def main() -> int:
 
     errors = validate_tree()
     if args.dist:
-        artifacts = sorted(args.dist.glob("legends_stable_audio_3-0.4.0*"))
+        artifacts = sorted(args.dist.glob(f"legends_stable_audio_3-{VERSION}*"))
         wheels = [path for path in artifacts if path.suffix == ".whl"]
         sdists = [path for path in artifacts if path.name.endswith(".tar.gz")]
         if len(wheels) != 1 or len(sdists) != 1:
-            errors.append("dist must contain exactly one v0.4.0 wheel and one v0.4.0 sdist")
+            errors.append(
+                f"dist must contain exactly one v{VERSION} wheel and one v{VERSION} sdist"
+            )
         for artifact in wheels + sdists:
             errors.extend(validate_archive(artifact))
 

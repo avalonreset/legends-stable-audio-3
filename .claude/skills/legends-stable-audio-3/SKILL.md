@@ -71,7 +71,7 @@ web studio, and downstream mixing visibly separate in plans and receipts.
 
 ## Hosted Large and web studio boundaries
 
-Keep these four surfaces distinct in every plan and receipt:
+Keep these five surfaces distinct in every plan and receipt:
 
 1. local Stable Audio 3 Medium;
 2. hosted Stable Audio 3 Large through the Platform REST model ID `stable-audio-3`;

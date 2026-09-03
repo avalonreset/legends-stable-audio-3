@@ -2,26 +2,88 @@
 
 <img src="assets/banner.webp" alt="Legends Stable Audio 3 banner: open-weight music automation, planned like infrastructure." width="100%">
 
-![Release](https://img.shields.io/badge/release-v0.4.0-7c3aed)
-![License](https://img.shields.io/badge/license-Apache--2.0-blue)
-![Python](https://img.shields.io/badge/python-3.10+-3776AB)
+[![CI](https://github.com/avalonreset/legends-stable-audio-3/actions/workflows/ci.yml/badge.svg)](https://github.com/avalonreset/legends-stable-audio-3/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/avalonreset/legends-stable-audio-3)](https://github.com/avalonreset/legends-stable-audio-3/releases/latest)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
+![Python](https://img.shields.io/badge/python-3.10%2B-3776AB)
 ![Agents](https://img.shields.io/badge/agents-Codex%20%7C%20Grok%20%7C%20Claude%20%7C%20Gemini-111827)
+[![CTO Legends](https://img.shields.io/badge/CTO-Legends-E10600)](https://cto-legends.com)
 
-Cross-platform agentic operator for Stable Audio 3.
+Give Codex, Grok, Claude, or Gemini a portable operating brain for Stable Audio
+3—then use the same guarded CLI for local Medium, hosted Large, and long-form
+audio production. No private vault or Obsidian setup is required.
 
-Legends Stable Audio 3 is an agentic control layer that keeps local Medium,
-hosted Large, the Stable Audio web studio, and downstream mixing distinct. Its
-CLI handles local model access, setup, prompting, VRAM-aware planning,
-generation, resumable batches, and final audio assembly. One supported workflow
+Legends Stable Audio 3 keeps local Medium, hosted Large, the Stable Audio web
+studio, the DAW plugin, and downstream mixing distinct. Its CLI handles local
+model access, setup, prompting, VRAM-aware planning, generation, resumable
+batches, guarded paid API jobs, and final audio assembly. One supported workflow
 can fill hours of background music by generating multiple coherent tracks and
 crossfading them, but the project is not limited to long-form or background
 music.
 
-Stable Audio 3 Medium is not a Suno-style lyric-to-song system. It is strongest
-for instrumental music, music beds, samples, sound effects, stems, audio-to-audio
-edits, inpainting, continuation, and long-form mixes assembled from fresh
-segments. It can sometimes create vocal-like textures, but it does not reliably
-generate intelligible sung lyrics.
+Stable Audio 3 Medium is not a Suno-style lyric-to-song system. The local CLI is
+strongest for instrumental music, music beds, samples, sound effects, adapter
+experiments, and long-form mixes assembled from fresh segments. The guarded
+hosted Large client adds text-to-audio, audio-to-audio, and inpainting. Medium
+can sometimes create vocal-like textures, but it does not reliably generate
+intelligible sung lyrics.
+
+## Why use Legends instead of approaching the model cold?
+
+A generic request such as `make a dark cinematic techno track` leaves the agent
+to guess the surface, prompt structure, duration, BPM strategy, sampler settings,
+seed policy, and recovery path. Legends gives the agent a repeatable operating
+method:
+
+1. Route the request to local Medium, hosted Large, the web studio, the plugin,
+   or downstream mixing without silently substituting one for another.
+2. Turn the creative brief into concrete musical metadata plus concise prose.
+3. Use short prompt-family and seed tournaments before committing GPU time or
+   paid credits.
+4. Choose duration, BPM, steps, CFG, and VRAM-aware segment sizes deliberately.
+5. Preserve source audio, generation IDs, hashes, and resumable public-safe
+   receipts.
+6. Analyze active cues and assemble long masters without dead-air crossfades or
+   one enormous FFmpeg graph.
+
+That operating intelligence ships inside the skill. It is the product—not a
+link back to a private development vault.
+
+## Choose your surface
+
+| Goal | Legends route |
+|---|---|
+| Give an agent the full Stable Audio 3 operating method | Install or open the canonical skill |
+| Run Stable Audio 3 Medium locally | Local CLI, official runtime, gated model bundle, and a hardware-appropriate PyTorch install |
+| Use Stable Audio 3 Large through the API | Guarded `large plan/generate/result` workflow with explicit paid confirmation and recovery |
+| Work in Stable Audio's web studio or DAW plugin | Bundled routing and production guidance; no false claim of end-to-end browser automation |
+| Analyze or assemble existing tracks | Active-cue analysis and streaming crossfade mixer |
+
+## Install the agent skill
+
+### Source checkout
+
+Clone the repository and open that directory in Codex, Grok, Claude Code, or
+Gemini CLI. The repository includes `AGENTS.md`, `GROK.md`, `CLAUDE.md`,
+`GEMINI.md`, and one synchronized canonical skill:
+
+```bash
+git clone https://github.com/avalonreset/legends-stable-audio-3.git
+cd legends-stable-audio-3
+```
+
+To install the packaged skill into a configured directory-based Agent Skills
+target, install the release wheel and choose the target explicitly:
+
+```bash
+python -m pip install "https://github.com/avalonreset/legends-stable-audio-3/releases/download/v0.4.1/legends_stable_audio_3-0.4.1-py3-none-any.whl"
+legends-sa3 skill validate
+legends-sa3 skill install --target <skills-directory>
+```
+
+The installer creates `<skills-directory>/legends-stable-audio-3` and refuses
+to replace an existing copy. Client discovery locations vary, so it never
+guesses or edits global agent configuration.
 
 ## What it does
 
@@ -36,8 +98,10 @@ generate intelligible sung lyrics.
   music styles.
 - Manages an optional Underfit-powered LoRA Studio workflow for training custom
   Stable Audio 3 adapters.
-- Supports samples, sound effects, audio-to-audio edits, inpainting, and
-  continuation workflows supported by Stable Audio 3.
+- Runs local Medium prompt-to-audio batches and guarded hosted Large
+  text-to-audio, audio-to-audio, and inpainting jobs.
+- Gives agents explicit web-studio, DAW-plugin, prompting, benchmarking, and
+  receipt guidance without pretending those are local CLI features.
 - Analyzes generated source tracks for quiet heads/tails before mixing.
 - Optionally renders a long continuous MP3 by streaming crossfades between tracks.
 - Analyzes track heads, tails, and active cue points before long MP3 assembly.
@@ -57,9 +121,9 @@ generate intelligible sung lyrics.
 - Its Apache-2.0 source license does not cover model weights, adapters, datasets,
   hosted services, third-party software, or generated media.
 
-## Quick start
+## Local Medium quick start
 
-From a source checkout on Windows PowerShell:
+From the source checkout on Windows PowerShell:
 
 ```powershell
 python -m venv .venv
@@ -346,8 +410,8 @@ Codex, Grok, Claude, or Gemini locations.
 
 ## Status
 
-Current package version: `v0.4.0`. The repository is in public-release
-preparation; no public release is being created by this work.
+Current package version: `v0.4.1`. The project is public and the current release
+is available from [GitHub Releases](https://github.com/avalonreset/legends-stable-audio-3/releases/latest).
 
 Project-owned source, documentation, tests, and the current banner are licensed
 under [Apache License 2.0](LICENSE). `NOTICE`, `THIRD_PARTY_NOTICES.md`, and
@@ -360,4 +424,5 @@ affiliated with, sponsored by, or endorsed by Stability AI. Stability AI and
 Stable Audio names identify compatible services and models; their marks remain
 with their respective owners.
 
-Repository target: `https://github.com/avalonreset/legends-stable-audio-3`.
+Project: [cto-legends.com](https://cto-legends.com) · Source:
+[avalonreset/legends-stable-audio-3](https://github.com/avalonreset/legends-stable-audio-3)

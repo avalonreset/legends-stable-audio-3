@@ -44,7 +44,7 @@ with `python scripts/sync_skill_adapters.py --sync`; do not hand-edit mirrors.
 ## Standard workflow
 
 1. Run `legends-sa3 doctor`.
-2. If model files are missing, guide the user through `huggingface-cli login` and:
+2. If model files are missing, guide the user through `hf auth login` and:
    `legends-sa3 download-model --model medium --output ./models/stable-audio-3-medium`.
 3. Shape a metadata-plus-prose prompt and seed tournament. Default the
    post-trained Medium checkpoint to 8 steps and CFG 1.0; negative prompts are

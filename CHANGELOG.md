@@ -2,6 +2,28 @@
 
 All notable changes to `legends-stable-audio-3` will be documented here.
 
+## 0.4.1 - 2026-09-03
+
+### Changed
+
+- Reworked the README around the agent-first value proposition, explicit surface
+  routing, copyable installation paths, and the live public release.
+- Linked the project to CTO Legends from the README and Python package metadata.
+- Expanded CI to Windows, Ubuntu, and macOS across Python 3.10, 3.12, and 3.14.
+- Aligned issue and generated-release categories with the actual product surfaces
+  and repository labels.
+- Updated Hugging Face authentication guidance to the current `hf auth login`
+  command and documented the hosted `STABILITY_API_KEY` environment boundary.
+
+### Fixed
+
+- Removed stale README and security-policy language that still described the
+  repository as private or unreleased.
+- Corrected the canonical skill's five-surface count and synchronized every
+  generated agent and package mirror.
+- Added release checks that reject stale pre-publication statements in future
+  candidates.
+
 ## 0.4.0 - 2026-09-03
 
 ### Added

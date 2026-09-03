@@ -25,10 +25,12 @@ body:
         - Setup/install
         - Model download
         - VRAM planning
-        - Generation
+        - Local Medium generation
+        - Hosted Large API
+        - Web studio or DAW plugin
+        - LoRA or DoRA adapters
         - Mixing/mastering
         - Agent integration
         - Documentation
     validations:
       required: true
-

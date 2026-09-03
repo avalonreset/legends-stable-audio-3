@@ -8,18 +8,20 @@ changelog:
   categories:
     - title: Added
       labels:
-        - feature
         - enhancement
     - title: Fixed
       labels:
         - bug
-        - fix
     - title: Security
       labels:
         - security
     - title: Documentation
       labels:
         - documentation
+    - title: Dependencies
+      labels:
+        - dependencies
+        - github_actions
     - title: Other Changes
       labels:
         - "*"

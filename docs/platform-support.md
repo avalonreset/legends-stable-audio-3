@@ -17,8 +17,8 @@ GPU acceleration.
 
 ## Requirements
 
-- Python 3.10 or newer. Release CI covers Python 3.10 and 3.12 on Windows and
-  Ubuntu; release preparation also exercises Python 3.13 clean installs.
+- Python 3.10 or newer. Release CI covers Python 3.10, 3.12, and the current
+  latest supported CPython on Windows, Ubuntu, and macOS.
 - FFmpeg and FFprobe on `PATH` for analysis, mixing, MP3 conversion, and paid
   audio-upload preflight.
 - `STABILITY_API_KEY` only for explicitly authorized hosted Large requests.

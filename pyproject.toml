@@ -4,21 +4,35 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "legends-stable-audio-3"
-version = "0.4.0"
+version = "0.4.1"
 description = "Agentic Stable Audio 3 operator for model access, prompting, generation, VRAM planning, and crossfaded mixes"
 readme = "README.md"
 requires-python = ">=3.10"
 license = "Apache-2.0"
 license-files = ["LICENSE", "NOTICE", "THIRD_PARTY_NOTICES.md"]
 authors = [{ name = "Avalon Reset" }]
+keywords = ["agent-skills", "audio-generation", "generative-audio", "stable-audio"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+]
 dependencies = [
   "numpy>=1.24,<3",
 ]
 
 [project.urls]
-Homepage = "https://github.com/avalonreset/legends-stable-audio-3"
+Homepage = "https://cto-legends.com"
 Repository = "https://github.com/avalonreset/legends-stable-audio-3"
 Issues = "https://github.com/avalonreset/legends-stable-audio-3/issues"
+Changelog = "https://github.com/avalonreset/legends-stable-audio-3/blob/main/CHANGELOG.md"
+Documentation = "https://github.com/avalonreset/legends-stable-audio-3#documentation"
+Releases = "https://github.com/avalonreset/legends-stable-audio-3/releases"
 
 [project.optional-dependencies]
 download = ["huggingface_hub>=0.23,<2"]

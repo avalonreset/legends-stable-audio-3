@@ -17,7 +17,7 @@ legends-sa3 download-model --model medium --output .\models\stable-audio-3-mediu
 ```
 
 If that fails, confirm that you accepted the model terms and ran
-`huggingface-cli login`.
+`hf auth login`.
 
 ## CUDA is not detected
 

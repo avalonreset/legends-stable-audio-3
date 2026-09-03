@@ -22,12 +22,13 @@ model-access bypass, supply-chain compromise, path traversal, or arbitrary
 command execution concern. Do not attach tokens, model files, private datasets,
 licensed media, or sensitive local paths.
 
-## Target-setting gate
+## Reporting posture
 
-The public repository does not exist yet. Before making it public, the release
-owner must enable private vulnerability reporting and verify that the exact URL
-above accepts a draft advisory. Publication remains blocked until that check
-passes. No alternate email address is claimed by this project.
+The repository is public and GitHub private vulnerability reporting is enabled.
+Use the private advisory URL above for security concerns. If GitHub makes that
+surface temporarily unavailable, wait or contact the maintainer through GitHub;
+do not disclose a suspected vulnerability in a public issue. No alternate email
+address is claimed by this project.
 
 ## What to include
 

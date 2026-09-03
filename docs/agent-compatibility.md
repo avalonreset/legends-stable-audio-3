@@ -15,7 +15,7 @@ generated mirrors; they are not independent sources of operating truth.
 | Gemini CLI | `GEMINI.md`, `gemini-extension.json` | Extension context routed to the canonical skill |
 
 Do not claim automatic discovery for a client until its live version and
-configuration prove it. All four surfaces still share the same safe workflow
+configuration prove it. All four agent integrations still share the same safe workflow
 when the repository instructions are loaded.
 The canonical package includes the exact guarded Large REST workflow, so no
 runtime-specific adapter must reinvent API parameters or paid-action policy.
