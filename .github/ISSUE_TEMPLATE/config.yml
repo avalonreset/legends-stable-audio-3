@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Support guidance
+    url: https://github.com/avalonreset/legends-stable-audio-3/blob/main/SUPPORT.md
+    about: Read the support and safe-reporting guidance before opening an issue.
+  - name: Private security report
+    url: https://github.com/avalonreset/legends-stable-audio-3/security/advisories/new
+    about: Report suspected vulnerabilities privately; never post secrets in an issue.

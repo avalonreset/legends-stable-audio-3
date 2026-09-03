@@ -1,0 +1,50 @@
+[build-system]
+requires = ["setuptools>=77,<82", "wheel>=0.45,<1"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "legends-stable-audio-3"
+version = "0.4.0"
+description = "Agentic Stable Audio 3 operator for model access, prompting, generation, VRAM planning, and crossfaded mixes"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE", "THIRD_PARTY_NOTICES.md"]
+authors = [{ name = "Avalon Reset" }]
+dependencies = [
+  "numpy>=1.24,<3",
+]
+
+[project.urls]
+Homepage = "https://github.com/avalonreset/legends-stable-audio-3"
+Repository = "https://github.com/avalonreset/legends-stable-audio-3"
+Issues = "https://github.com/avalonreset/legends-stable-audio-3/issues"
+
+[project.optional-dependencies]
+download = ["huggingface_hub>=0.23,<2"]
+generate = ["torch>=2.4,<3", "torchaudio>=2.4,<3", "huggingface_hub>=0.23,<2"]
+dev = ["pytest>=8,<10"]
+
+[dependency-groups]
+release = [
+  "build==1.6.0",
+  "pip-audit==2.10.1",
+  "pip-licenses==5.5.5",
+  "ruff==0.12.12",
+]
+
+[project.scripts]
+legends-sa3 = "legends_sa3.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+legends_sa3 = [
+  "_bundled_skill/legends-stable-audio-3/SKILL.md",
+  "_bundled_skill/legends-stable-audio-3/agents/*.yaml",
+  "_bundled_skill/legends-stable-audio-3/references/*.md",
+]
+
+[tool.uv]
+required-version = ">=0.11.26,<0.12"

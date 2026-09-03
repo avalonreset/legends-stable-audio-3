@@ -1,0 +1,4 @@
+interface:
+  display_name: "Legends Stable Audio 3"
+  short_description: "Plan and operate safe Stable Audio 3 workflows"
+  default_prompt: "Use $legends-stable-audio-3 to plan a safe, evidence-backed Stable Audio 3 workflow."

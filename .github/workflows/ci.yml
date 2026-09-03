@@ -1,0 +1,111 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: ${{ matrix.os }} / Python ${{ matrix.python }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ["3.10", "3.12"]
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+      - name: Install core package
+        run: python -m pip install --disable-pip-version-check -e .
+      - name: Run unit and Git-less export tests
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: python -m unittest discover -s tests
+      - name: Validate canonical skill and mirrors
+        run: python scripts/sync_skill_adapters.py
+      - name: Validate release tree
+        run: python scripts/release_checks.py
+      - name: Verify 10-hour plan
+        run: python -m legends_sa3 plan --hours 10 --vram-gb 24 --crossfade 12
+
+  build-audit:
+    name: Build, clean install, SBOM, and licenses
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install pinned resolver
+        run: python -m pip install --disable-pip-version-check uv==0.11.26
+      - name: Verify frozen dependency resolution
+        run: uv lock --check && uv sync --frozen --group release
+      - name: Lint Python source and release tooling
+        run: uv run --frozen --group release ruff check src tests scripts
+      - name: Build source and wheel distributions
+        run: uv run --frozen --group release python -m build --sdist --wheel
+      - name: Inspect distribution contents
+        run: uv run --frozen --group release python scripts/release_checks.py --dist dist
+      - name: Prove clean wheel and source installs
+        run: uv run --frozen --group release python scripts/verify_clean_install.py --dist dist
+      - name: Export frozen dependencies for audit
+        run: uv export --frozen --all-extras --group release --no-emit-project --no-hashes --output-file audit-requirements.txt
+      - name: Audit locked dependencies
+        run: uv run --frozen --group release pip-audit --requirement audit-requirements.txt --no-deps --progress-spinner off
+      - name: Generate CycloneDX SBOM
+        run: uv run --frozen --group release pip-audit --requirement audit-requirements.txt --no-deps --progress-spinner off --format cyclonedx-json --output sbom.cdx.json
+      - name: Generate and check dependency licenses
+        run: |
+          uv run --frozen --group release pip-licenses --format=json --output-file dependency-licenses.json
+          uv run --frozen --group release python scripts/check_dependency_licenses.py dependency-licenses.json
+      - name: Preserve release evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: release-evidence-python-3.12
+          path: |
+            dist/
+            sbom.cdx.json
+            dependency-licenses.json
+            audit-requirements.txt
+          if-no-files-found: error
+          retention-days: 14
+
+  secrets:
+    name: Gitleaks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out complete history
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Scan for secrets
+        uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

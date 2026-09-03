@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+title: "Legends Stable Audio 3"
+version: "0.4.0"
+authors:
+  - name: "Avalon Reset"
+repository-code: "https://github.com/avalonreset/legends-stable-audio-3"
+url: "https://github.com/avalonreset/legends-stable-audio-3"
+license: "Apache-2.0"
+abstract: "An agentic operator for Stable Audio 3 prompting, local generation, adapters, analysis, and cue-aware mixing."

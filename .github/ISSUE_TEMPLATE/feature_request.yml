@@ -1,0 +1,34 @@
+name: Feature request
+description: Suggest a new preset, workflow, or integration
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What are you trying to do?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: What should the project add or change?
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Setup/install
+        - Model download
+        - VRAM planning
+        - Generation
+        - Mixing/mastering
+        - Agent integration
+        - Documentation
+    validations:
+      required: true
+

@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "name": "legends-stable-audio-3",
+  "canonical": "skills/legends-stable-audio-3",
+  "mirrors": {
+    "agent-skills": ".agents/skills/legends-stable-audio-3",
+    "claude-code": ".claude/skills/legends-stable-audio-3",
+    "python-package": "src/legends_sa3/_bundled_skill/legends-stable-audio-3"
+  },
+  "adapters": {
+    "codex": "AGENTS.md",
+    "grok": "GROK.md",
+    "claude": "CLAUDE.md",
+    "gemini": "GEMINI.md",
+    "gemini-extension": "gemini-extension.json"
+  }
+}
