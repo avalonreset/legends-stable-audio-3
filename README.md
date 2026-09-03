@@ -2,7 +2,7 @@
 
 <img src="assets/banner.webp" alt="Legends Stable Audio 3 banner: open-weight music automation, planned like infrastructure." width="100%">
 
-![Status](https://img.shields.io/badge/status-public%20release%20prep-7c3aed)
+![Release](https://img.shields.io/badge/release-v0.4.0-7c3aed)
 ![License](https://img.shields.io/badge/license-Apache--2.0-blue)
 ![Python](https://img.shields.io/badge/python-3.10+-3776AB)
 ![Agents](https://img.shields.io/badge/agents-Codex%20%7C%20Grok%20%7C%20Claude%20%7C%20Gemini-111827)
