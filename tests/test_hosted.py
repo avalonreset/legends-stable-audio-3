@@ -62,7 +62,11 @@ class HostedLargeTests(unittest.TestCase):
             self.assertEqual(request.form_fields()["mask_end"], "40")
 
     def test_submit_and_poll_do_not_put_key_in_body_or_receipt(self):
-        submitted = FakeResponse(202, json.dumps({"id": "gen-123"}).encode())
+        submitted = FakeResponse(
+            202,
+            json.dumps({"id": "gen-123"}).encode(),
+            {"Content-Type": "application/json"},
+        )
         pending = FakeResponse(202, json.dumps({"id": "gen-123", "status": "in-progress"}).encode())
         finished = FakeResponse(
             200,
@@ -81,7 +85,7 @@ class HostedLargeTests(unittest.TestCase):
             return [submitted, pending, finished][len(requests) - 1]
 
         with tempfile.TemporaryDirectory() as temp, patch(
-            "urllib.request.urlopen", side_effect=fake_urlopen
+            "legends_sa3.hosted._open_url", side_effect=fake_urlopen
         ):
             request = LargeRequest(operation="text-to-audio", prompt="One-shot impact", duration=10)
             generation_id = submit_large(request, "secret-test-key")
@@ -125,7 +129,7 @@ class HostedLargeTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp:
             output = Path(temp) / "result.wav"
             output.write_bytes(b"existing")
-            with patch("urllib.request.urlopen") as urlopen:
+            with patch("legends_sa3.hosted._open_url") as urlopen:
                 with self.assertRaisesRegex(FileExistsError, "--overwrite"):
                     poll_large_result("gen-123", "secret", output, output_format="wav")
             urlopen.assert_not_called()
@@ -133,7 +137,7 @@ class HostedLargeTests(unittest.TestCase):
     def test_poll_rejects_non_audio_success_payload(self):
         response = FakeResponse(200, b'{"error":"not audio"}', {"Content-Type": "application/json"})
         with tempfile.TemporaryDirectory() as temp, patch(
-            "urllib.request.urlopen", return_value=response
+            "legends_sa3.hosted._open_url", return_value=response
         ):
             output = Path(temp) / "result.wav"
             with self.assertRaisesRegex(HostedAPIError, "validation failed"):
@@ -143,11 +147,106 @@ class HostedLargeTests(unittest.TestCase):
     def test_submission_network_error_warns_against_duplicate_paid_call(self):
         request = LargeRequest(operation="text-to-audio", prompt="One-shot impact", duration=10)
         with patch(
-            "urllib.request.urlopen",
+            "legends_sa3.hosted._open_url",
             side_effect=urllib.error.URLError("connection reset"),
         ):
             with self.assertRaisesRegex(HostedAPIError, "Do not blindly submit again"):
                 submit_large(request, "secret")
+
+    def test_runtime_numeric_validation_rejects_bool_fractional_steps_and_nonfinite(self):
+        bad_requests = [
+            LargeRequest(operation="text-to-audio", prompt="test", steps=4.5),
+            LargeRequest(operation="text-to-audio", prompt="test", steps=True),
+            LargeRequest(operation="text-to-audio", prompt="test", seed=True),
+            LargeRequest(operation="text-to-audio", prompt="test", duration=float("nan")),
+            LargeRequest(operation="text-to-audio", prompt="test", cfg_scale=float("inf")),
+        ]
+        for request in bad_requests:
+            with self.subTest(request=request), self.assertRaises(ValueError):
+                request.validate()
+
+    def test_poll_requires_nonblank_key_and_finite_timing_before_network(self):
+        with tempfile.TemporaryDirectory() as temp, patch(
+            "legends_sa3.hosted._open_url"
+        ) as open_url:
+            output = Path(temp) / "result.wav"
+            with self.assertRaisesRegex(ValueError, "STABILITY_API_KEY"):
+                poll_large_result("gen-123", "  ", output, output_format="wav")
+            with self.assertRaisesRegex(ValueError, "finite"):
+                poll_large_result(
+                    "gen-123",
+                    "secret",
+                    output,
+                    output_format="wav",
+                    timeout=float("nan"),
+                )
+            with self.assertRaisesRegex(ValueError, "finite"):
+                poll_large_result(
+                    "gen-123",
+                    "secret",
+                    output,
+                    output_format="wav",
+                    poll_interval=float("inf"),
+                )
+            open_url.assert_not_called()
+
+    def test_submit_requires_202_json_object(self):
+        request = LargeRequest(operation="text-to-audio", prompt="test")
+        responses = [
+            FakeResponse(200, b'{"id":"gen-123"}', {"Content-Type": "application/json"}),
+            FakeResponse(202, b"[]", {"Content-Type": "application/json"}),
+            FakeResponse(202, b'{"id":"gen-123"}', {"Content-Type": "text/html"}),
+        ]
+        for response in responses:
+            with self.subTest(status=response.status), patch(
+                "legends_sa3.hosted._open_url", return_value=response
+            ), self.assertRaises(HostedAPIError):
+                submit_large(request, "secret")
+
+    def test_poll_retries_transient_get_and_honors_retry_after(self):
+        transient = urllib.error.HTTPError(
+            "https://api.stability.ai/result",
+            429,
+            "rate limited",
+            {"Retry-After": "3"},
+            None,
+        )
+        finished = FakeResponse(
+            200,
+            b"RIFF\x04\x00\x00\x00WAVEdata",
+            {"Content-Type": "audio/wav"},
+        )
+        sleeps = []
+        with tempfile.TemporaryDirectory() as temp, patch(
+            "legends_sa3.hosted._open_url", side_effect=[transient, finished]
+        ):
+            result = poll_large_result(
+                "gen-123",
+                "secret",
+                Path(temp) / "result.wav",
+                output_format="wav",
+                poll_interval=1,
+                sleep=sleeps.append,
+            )
+        self.assertEqual(sleeps, [3.0])
+        self.assertEqual(result["generation_id"], "gen-123")
+
+    def test_poll_bounds_transient_get_retries(self):
+        with tempfile.TemporaryDirectory() as temp, patch(
+            "legends_sa3.hosted._open_url",
+            side_effect=urllib.error.URLError("offline"),
+        ) as open_url:
+            with self.assertRaisesRegex(HostedAPIError, "polled again"):
+                poll_large_result(
+                    "gen-123",
+                    "secret",
+                    Path(temp) / "result.wav",
+                    output_format="wav",
+                    poll_interval=0,
+                    max_retries=2,
+                    sleep=lambda _: None,
+                )
+        self.assertEqual(open_url.call_count, 3)
 
     def test_cli_refuses_paid_call_without_confirmation(self):
         with patch.dict(os.environ, {"STABILITY_API_KEY": "test"}):

@@ -37,7 +37,7 @@ PowerShell:
 
 ```powershell
 python -m venv .venv
-.\.venv\Scripts\python -m pip install .
+.\.venv\Scripts\python -m pip install ".[download]"
 .\.venv\Scripts\legends-sa3 doctor
 ```
 
@@ -45,7 +45,7 @@ POSIX shell on Linux or macOS:
 
 ```bash
 python3 -m venv .venv
-./.venv/bin/python -m pip install .
+./.venv/bin/python -m pip install '.[download]'
 ./.venv/bin/legends-sa3 doctor
 ```
 

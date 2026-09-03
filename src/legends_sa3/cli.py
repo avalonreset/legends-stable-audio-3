@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import os
 import tempfile
 from pathlib import Path
 
+from . import __version__
 from .doctor import ffprobe_duration, run_doctor
 from .hf_download import download_model
 from .hosted import (
@@ -384,6 +386,19 @@ def _require_large_api_key() -> str:
     return api_key
 
 
+def _validate_polling_args(*, poll_interval: float, result_timeout: float, request_timeout: float | None = None) -> None:
+    values = {"poll interval": poll_interval, "result timeout": result_timeout}
+    if request_timeout is not None:
+        values["request timeout"] = request_timeout
+    for name, value in values.items():
+        if not math.isfinite(value):
+            raise ValueError(f"{name} must be finite")
+    if poll_interval < 0:
+        raise ValueError("poll interval must be non-negative")
+    if result_timeout <= 0 or (request_timeout is not None and request_timeout <= 0):
+        raise ValueError("timeouts must be positive")
+
+
 def _large_output_paths(args: argparse.Namespace) -> tuple[Path, Path]:
     output = Path(args.output).expanduser().resolve()
     if output.suffix.lower() != f".{args.output_format}":
@@ -442,8 +457,11 @@ def cmd_large_generate(args: argparse.Namespace) -> int:
         request.validate()
         _preflight_large_audio(request)
         output, receipt_path = _large_output_paths(args)
-        if args.poll_interval < 0 or args.request_timeout <= 0 or args.result_timeout <= 0:
-            raise ValueError("poll interval must be non-negative and timeouts must be positive")
+        _validate_polling_args(
+            poll_interval=args.poll_interval,
+            request_timeout=args.request_timeout,
+            result_timeout=args.result_timeout,
+        )
     except (FileExistsError, ValueError) as error:
         raise SystemExit(str(error)) from error
     print(f"confirmed_live_credits: {args.confirmed_live_credits}")
@@ -467,6 +485,7 @@ def cmd_large_generate(args: argparse.Namespace) -> int:
             output_format=args.output_format,
             poll_interval=args.poll_interval,
             timeout=args.result_timeout,
+            max_retries=args.max_result_retries,
             overwrite=args.overwrite,
         )
         receipt = write_public_receipt(
@@ -488,8 +507,10 @@ def cmd_large_result(args: argparse.Namespace) -> int:
     api_key = _require_large_api_key()
     try:
         output, receipt_path = _large_output_paths(args)
-        if args.poll_interval < 0 or args.result_timeout <= 0:
-            raise ValueError("poll interval must be non-negative and result timeout must be positive")
+        _validate_polling_args(
+            poll_interval=args.poll_interval,
+            result_timeout=args.result_timeout,
+        )
         result = poll_large_result(
             args.generation_id,
             api_key,
@@ -497,6 +518,7 @@ def cmd_large_result(args: argparse.Namespace) -> int:
             output_format=args.output_format,
             poll_interval=args.poll_interval,
             timeout=args.result_timeout,
+            max_retries=args.max_result_retries,
             overwrite=args.overwrite,
         )
         receipt = write_recovery_receipt(
@@ -615,7 +637,10 @@ def cmd_skill_validate(args: argparse.Namespace) -> int:
 
 
 def cmd_skill_install(args: argparse.Namespace) -> int:
-    installed = install_bundled_skill(Path(args.target))
+    try:
+        installed = install_bundled_skill(Path(args.target))
+    except (FileExistsError, OSError, ValueError) as error:
+        raise SystemExit(str(error)) from error
     print(f"installed_skill: {installed}")
     print("The target was explicit; no global agent configuration was inferred or changed.")
     return 0
@@ -623,6 +648,7 @@ def cmd_skill_install(args: argparse.Namespace) -> int:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="legends-sa3")
+    parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     sub = parser.add_subparsers(dest="command", required=True)
 
     doctor = sub.add_parser("doctor")
@@ -679,7 +705,12 @@ def build_parser() -> argparse.ArgumentParser:
     generate.add_argument("--crossfade", type=int, default=12)
     generate.add_argument("--steps", type=int, default=8)
     generate.add_argument("--cfg-scale", type=float, default=1.0)
-    generate.add_argument("--seed-base", type=int, default=60470000)
+    generate.add_argument(
+        "--seed-base",
+        type=int,
+        default=60470000,
+        help="Seed used by the first track; later tracks increment by one",
+    )
     generate.add_argument("--bitrate", default="320k")
     generate.add_argument("--custom-style")
     generate.add_argument("--output", required=True)
@@ -703,6 +734,12 @@ def build_parser() -> argparse.ArgumentParser:
     large_generate.add_argument("--poll-interval", type=float, default=10)
     large_generate.add_argument("--request-timeout", type=float, default=120)
     large_generate.add_argument("--result-timeout", type=float, default=1800)
+    large_generate.add_argument(
+        "--max-result-retries",
+        type=int,
+        default=5,
+        help="Bounded retries for safe result GETs only; paid submissions are never retried",
+    )
     large_generate.add_argument("--overwrite", action="store_true")
     large_generate.set_defaults(func=cmd_large_generate)
 
@@ -715,6 +752,12 @@ def build_parser() -> argparse.ArgumentParser:
     large_result.add_argument("--receipt")
     large_result.add_argument("--poll-interval", type=float, default=10)
     large_result.add_argument("--result-timeout", type=float, default=1800)
+    large_result.add_argument(
+        "--max-result-retries",
+        type=int,
+        default=5,
+        help="Bounded retries for safe result GETs",
+    )
     large_result.add_argument("--overwrite", action="store_true")
     large_result.set_defaults(func=cmd_large_result)
 

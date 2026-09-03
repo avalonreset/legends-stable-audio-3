@@ -2,20 +2,7 @@
 
 All notable changes to `legends-stable-audio-3` will be documented here.
 
-## Unreleased
-
-### Added
-
-- Added guarded Stable Audio 3 Large REST planning and execution for
-  text-to-audio, audio-to-audio, and inpaint, including asynchronous polling,
-  atomic download, SHA-256, and secret-free receipts.
-- Added a portable live-schema reference covering exact endpoints, parameters,
-  paid-action gates, result handling, and web/API/DAW boundaries.
-- Added interrupted-job recovery through `large result`, immediate pending
-  receipts, upload preflight, response validation, public-safe file names, and
-  overwrite protection for hosted Large operations.
-
-## 0.4.0 - 2026-09-02
+## 0.4.0 - 2026-09-03
 
 ### Added
 
@@ -31,6 +18,19 @@ All notable changes to `legends-stable-audio-3` will be documented here.
   and SBOM/license-report generation.
 - Added package-installed `legends-sa3 skill validate/install` commands and
   included the canonical skill bundle in built artifacts.
+- Added guarded Stable Audio 3 Large REST planning and execution for
+  text-to-audio, audio-to-audio, and inpaint, including asynchronous polling,
+  atomic download, SHA-256, and secret-free receipts.
+- Added a portable live-schema reference covering exact endpoints, parameters,
+  paid-action gates, result handling, and web/API/DAW boundaries.
+- Added interrupted-job recovery through `large result`, immediate pending
+  receipts, upload preflight, response validation, public-safe file names,
+  bounded safe-GET retries, and overwrite protection for hosted Large
+  operations. Paid POSTs are never automatically retried.
+- Added complete gated Medium bundle download support, including the required
+  T5Gemma conditioner, local config wiring, and incomplete-bundle validation.
+- Added `legends-sa3 --version`, cross-platform fresh-environment commands, and
+  repository adapters in the source archive.
 - Added security, support, citation, ownership, Dependabot, NOTICE, and asset
   provenance surfaces for the first public release.
 

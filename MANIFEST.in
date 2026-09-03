@@ -2,6 +2,13 @@ include LICENSE
 include NOTICE
 include THIRD_PARTY_NOTICES.md
 include skill-package.json
+include AGENTS.md
+include CLAUDE.md
+include GEMINI.md
+include GROK.md
+include gemini-extension.json
+graft .agents
+graft .claude
 recursive-include docs *.md
 recursive-include scripts *.py
 recursive-include skills *.md *.yaml

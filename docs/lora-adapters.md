@@ -28,8 +28,8 @@ legends-sa3 generate `
   --style "digital hardcore breakbeat trance, distorted 909 kicks, chopped amen breaks, acidic bassline, no vocals, 172 BPM" `
   --minutes 6 `
   --vram-gb 24 `
-  --steps 16 `
-  --cfg-scale 3.0 `
+  --steps 8 `
+  --cfg-scale 1.0 `
   --lora-ckpt-path .\adapters\eisbach-medium\model.safetensors `
   --lora-strength 1.0 `
   --output .\output\eisbach-breakbeat-test

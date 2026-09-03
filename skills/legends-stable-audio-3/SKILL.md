@@ -147,19 +147,34 @@ the hosted checkpoint revision is not necessarily exposed.
 
 ## Workflow
 
-1. Run `legends-sa3 doctor`.
+0. Bootstrap a source checkout with an isolated environment. On Windows use
+   `python -m venv .venv`, then `.\.venv\Scripts\python.exe -m pip install -e
+   ".[download]"` and invoke `.\.venv\Scripts\legends-sa3.exe`. On macOS/Linux
+   use `python3 -m venv .venv`, `./.venv/bin/python -m pip install -e
+   '.[download]'`, and `./.venv/bin/legends-sa3`. Install `[generate]` only
+   after selecting the correct PyTorch build for the machine.
+1. Run `legends-sa3 doctor` from that environment.
 2. If model files are missing, explain the approval step and run:
    `legends-sa3 download-model --model medium --output ./models/stable-audio-3-medium`.
 3. Help shape the metadata-plus-prose prompt, duration, and seed tournament.
    Default post-trained Medium to 8 Ping-Pong steps and CFG 1.0. Treat negative
    guidance at non-default CFG as an experiment, not a quality upgrade.
-4. Plan duration when needed:
-   `legends-sa3 plan --hours 10 --vram-gb 24 --crossfade 12`.
+4. Plan duration when needed. For example:
+   `legends-sa3 plan --minutes 60 --vram-gb 16 --crossfade 12`.
 5. Preview prompts when needed. For important music, compare 3-4 prompt families
-   with at least 4 short seeds each before a long render:
-   `legends-sa3 prompt --style "lo-fi study hip hop, warm Rhodes, soft boom bap drums" --count 3`.
+   with at least 4 short seeds each before a long render. `prompt --count` shows
+   expansion only; the actual local canary is a short one-track generation such
+   as `legends-sa3 generate --model-dir ./models/stable-audio-3-medium
+   --stable-audio-repo ../stable-audio-3 --style "lo-fi study hip hop, warm
+   Rhodes, soft boom bap drums, 82 BPM" --minutes 1 --track-seconds 60
+   --seed-base 41000 --steps 8 --cfg-scale 1 --output ./output/canary-41000`.
+   Repeat with a new output directory and seed base. `--seed-base` is the first
+   track's seed; later tracks increment by one.
 6. Generate:
-   `legends-sa3 generate --model-dir ./models/stable-audio-3-medium --style "lo-fi study hip hop, warm Rhodes, soft boom bap drums" --hours 10 --vram-gb 24 --output ./output/lofi-study-10h`.
+   `legends-sa3 generate --model-dir ./models/stable-audio-3-medium
+   --stable-audio-repo ../stable-audio-3 --style "lo-fi study hip hop, warm
+   Rhodes, soft boom bap drums, 82 BPM" --minutes 60 --vram-gb 16
+   --seed-base 41000 --steps 8 --cfg-scale 1 --output ./output/lofi-study-60m`.
 7. Optionally load native Stable Audio 3 LoRA or DoRA adapters:
    `legends-sa3 generate --lora-ckpt-path ./adapters/eisbach-medium/model.safetensors --lora-strength 1.0 ...`.
 8. Use `legends-sa3 lora-studio install/start/import/list-adapters` when the user

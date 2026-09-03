@@ -55,6 +55,12 @@ Underfit's current local quickstart targets Linux with an NVIDIA GPU. On Windows
 use Git Bash, WSL, or the Pinokio wrapper if the shell scripts are not directly
 available.
 
+Do not launch the upstream `run.sh` blindly on a shared or untrusted network: at
+the reviewed commit, Underfit's own dashboard server defaults to `0.0.0.0` and
+does not provide authentication. Use `legends-sa3 lora-studio start`, whose
+default is loopback-only `127.0.0.1`, and expose it only behind access controls
+you understand.
+
 ## Start
 
 Start the dashboard in the foreground:

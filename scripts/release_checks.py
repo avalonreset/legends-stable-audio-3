@@ -187,6 +187,13 @@ def validate_archive(path: Path) -> list[str]:
     else:
         required_suffixes.extend(
             [
+                "/agents.md",
+                "/claude.md",
+                "/gemini.md",
+                "/grok.md",
+                "/gemini-extension.json",
+                "/.agents/skills/legends-stable-audio-3/skill.md",
+                "/.claude/skills/legends-stable-audio-3/skill.md",
                 "/skills/legends-stable-audio-3/skill.md",
                 "/skills/legends-stable-audio-3/agents/openai.yaml",
                 "/skills/legends-stable-audio-3/references/licensing-and-dependencies.md",

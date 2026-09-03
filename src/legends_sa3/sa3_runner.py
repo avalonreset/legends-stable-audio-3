@@ -155,7 +155,7 @@ def generate_track_batch(
             instrumental=instrumental,
             omit_bpm=omit_bpm,
         )
-        seed = seed_base + index
+        seed = seed_base + index - 1
         print(f"[{index:03d}/{track_count:03d}] Generating seed={seed} bpm={track_bpm}", flush=True)
         started = time.time()
         audio = model.generate(

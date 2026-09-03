@@ -59,18 +59,34 @@ generate intelligible sung lyrics.
 
 ## Quick start
 
+From a source checkout on Windows PowerShell:
+
 ```powershell
 python -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -e .
-legends-sa3 doctor
-legends-sa3 skill validate
-legends-sa3 download-model --model medium --output .\models\stable-audio-3-medium
-legends-sa3 plan --minutes 4 --vram-gb 24 --crossfade 12
+.\.venv\Scripts\python.exe -m pip install -e ".[download]"
+.\.venv\Scripts\legends-sa3.exe doctor
+.\.venv\Scripts\legends-sa3.exe skill validate
+.\.venv\Scripts\legends-sa3.exe download-model --model medium --output .\models\stable-audio-3-medium
+.\.venv\Scripts\legends-sa3.exe plan --minutes 4 --vram-gb 24 --crossfade 12
+```
+
+On Linux or macOS:
+
+```bash
+python3 -m venv .venv
+./.venv/bin/python -m pip install -e '.[download]'
+./.venv/bin/legends-sa3 doctor
+./.venv/bin/legends-sa3 skill validate
+./.venv/bin/legends-sa3 download-model --model medium --output ./models/stable-audio-3-medium
+./.venv/bin/legends-sa3 plan --minutes 4 --vram-gb 24 --crossfade 12
 ```
 
 Before `download-model`, accept the Stability AI terms for the gated model and
-authenticate with Hugging Face yourself. This project never bundles weights or
-bypasses approval.
+the bundled T5Gemma conditioner, then authenticate with Hugging Face yourself.
+This project never bundles weights or bypasses approval. Install the separate
+`[generate]` extra only after selecting the hardware-appropriate PyTorch build;
+local Medium is a supported CUDA path on Windows/Linux and a CPU fallback on
+macOS, not a claimed MPS-accelerated workflow.
 
 Preview a hosted Stable Audio 3 Large REST request without spending credits:
 

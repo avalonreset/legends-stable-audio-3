@@ -57,13 +57,20 @@ def run_doctor() -> DoctorReport:
 
 
 def assert_model_dir(model_dir: Path) -> None:
-    missing = [
-        path.name
-        for path in [model_dir / "model_config.json", model_dir / "model.safetensors"]
-        if not path.exists()
+    required = [
+        model_dir / "model_config.json",
+        model_dir / "model.safetensors",
+        model_dir / "t5gemma-b-b-ul2" / "config.json",
+        model_dir / "t5gemma-b-b-ul2" / "model.safetensors",
+        model_dir / "t5gemma-b-b-ul2" / "tokenizer.json",
     ]
+    missing = [str(path.relative_to(model_dir)) for path in required if not path.exists()]
     if missing:
-        raise FileNotFoundError(f"Missing model files in {model_dir}: {', '.join(missing)}")
+        raise FileNotFoundError(
+            f"Incomplete Stable Audio 3 Medium bundle in {model_dir}; missing: {', '.join(missing)}. "
+            "Run `legends-sa3 download-model --model medium --output <that-directory>` "
+            "after accepting the gated Stability and Gemma terms."
+        )
 
 
 def ffprobe_duration(path: Path) -> float:

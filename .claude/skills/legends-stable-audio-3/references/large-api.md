@@ -26,7 +26,7 @@ legends-sa3 large generate `
   --prompt "TrackType: Music, VocalType: Instrumental, deep dub techno, 118 BPM" `
   --duration 120 --seed 42 --steps 8 --cfg-scale 1 --output-format wav `
   --output .\output\large-canary.wav `
-  --confirmed-live-credits 26 --confirm-paid
+  --confirmed-live-credits <live-credits-per-call> --confirm-paid
 ```
 
 The guarded command submits one asynchronous generation, polls until the audio
@@ -45,7 +45,7 @@ legends-sa3 large generate \
   --prompt "TrackType: Music, VocalType: Instrumental, deep dub techno, 118 BPM" \
   --duration 120 --seed 42 --steps 8 --cfg-scale 1 --output-format wav \
   --output ./output/large-canary.wav \
-  --confirmed-live-credits 26 --confirm-paid
+  --confirmed-live-credits <live-credits-per-call> --confirm-paid
 ```
 
 ## Interrupted-job recovery
@@ -70,6 +70,10 @@ The recovery command only polls and downloads. It cannot create another paid
 generation. If submission itself ended with an ambiguous network error before
 an ID was received, inspect the Stability account/job history before deciding
 whether to submit again.
+
+Result polling retries transient `429`, `500`, `502`, `503`, and `504` responses
+and network failures with bounded backoff. `--max-result-retries` defaults to
+five. It never retries the paid POST.
 
 ## Endpoints and lifecycle
 
