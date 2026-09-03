@@ -4,7 +4,6 @@ import re
 import shutil
 from pathlib import Path
 
-
 SKILL_NAME = "legends-stable-audio-3"
 
 

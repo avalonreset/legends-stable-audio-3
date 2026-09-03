@@ -5,7 +5,6 @@ import json
 import sys
 from pathlib import Path
 
-
 BLOCKED_MARKERS = ("agpl", "gpl", "unknown", "proprietary", "commercial")
 
 

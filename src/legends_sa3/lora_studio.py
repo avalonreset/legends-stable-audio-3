@@ -10,7 +10,6 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 
-
 UNDERFIT_REPO_URL = "https://github.com/dada-bots/underfit"
 UNDERFIT_COMMIT = "8a96800a58c0e8b82327fc04ac31c473ed900b73"
 UNDERFIT_LICENSE = "MIT"

@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass
 import json
 import math
 import subprocess
+from dataclasses import asdict, dataclass
 from pathlib import Path
 
 import numpy as np

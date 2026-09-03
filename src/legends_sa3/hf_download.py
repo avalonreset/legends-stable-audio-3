@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-
 MODEL_REPOS = {
     "medium": "stabilityai/stable-audio-3-medium",
 }

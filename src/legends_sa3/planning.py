@@ -3,7 +3,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from math import ceil
 
-
 DEFAULT_MODEL_MAX_SECONDS = 380
 
 

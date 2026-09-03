@@ -10,7 +10,6 @@ from pathlib import Path
 
 from sync_skill_adapters import FORBIDDEN_RELEASE_SUFFIXES, git_release_files
 
-
 ROOT = Path(__file__).resolve().parents[1]
 VERSION = "0.4.0"
 PUBLIC_URL = "https://github.com/avalonreset/legends-stable-audio-3"

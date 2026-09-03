@@ -14,7 +14,6 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Callable
 
-
 API_BASE = "https://api.stability.ai/v2beta/audio"
 MODEL = "stable-audio-3"
 REFERENCE_CREDITS = 26
