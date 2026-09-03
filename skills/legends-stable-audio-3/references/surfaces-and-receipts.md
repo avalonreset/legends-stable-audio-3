@@ -8,12 +8,45 @@ Do not silently substitute one Stable Audio surface for another.
 |---|---|---|
 | Local Medium | Local text generation, seed search, batches, native adapters | Gated weights stay outside the package; hardware ceiling is not quality advice |
 | Hosted Large REST | Authorized paid text-to-audio, audio-to-audio, inpaint, benchmark work | No web lanes, web DSP, or immutable checkpoint revision is guaranteed |
-| Web studio / ST-1 | Full Mix, synchronized Multi-Track, lane editing, effects, export | Preserve displayed model; do not relabel the session as Large without proof |
+| Web studio (some KB screens call the engine ST-1) | Full Mix, synchronized Multi-Track, lane editing, effects, export | Preserve displayed model; do not relabel the session as Large without proof |
+| DAW plugin | In-session generation inside a supported DAW | Beta/platform support and cloud model can change; verify the live plugin |
 | Mixer or DAW | Cue selection, trimming, alignment, transitions, gain, crop, delivery | Editorial choices are not Stability model features or standards |
 
 Full Mix is one combined stereo composition. Multi-Track is one synchronized
 composition split into lanes or stems. Neither means a playlist, a DJ mix, or
 an official crossfade recipe.
+
+## Web studio field guide
+
+Verified against the official Stable Audio guide on 2026-09-03:
+
+- **Full Mix** sends the prompt as written and starts with one mixed track.
+- **Multi-Track** lets a producer agent choose an arrangement and returns
+  separate synchronized parts. It is experimental and can drift from a literal
+  prompt. One session holds up to four active tracks.
+- Length choices are `AUTO`, `0:30`, `1:00`, `1:30`, and `3:00`. Tempo + Key
+  reference attachment is Multi-Track-only; it transfers detected tempo/key,
+  not the attached audio's sound.
+- Generative actions are **Start Full Mix**, **Start Multi-Track**, **Add
+  Track**, **Regenerate**, **Replace Section**, and **Extend**. Mixing, faders,
+  pan, mute/solo, tape edits, splice edits, effects, bounce, and export operate
+  on existing audio and are described as non-generative/free.
+- Export **MIXDOWN** for one WAV or **STEMS** for a ZIP of active lanes. The
+  **NORM** toggle chooses normalized export versus deck level.
+- The dated web guide listed 4 credits for Full Mix, 6 for Multi-Track, and 4
+  for each Add Track, Regenerate, Replace Section, or Extend action. Recheck the
+  live meter before spending.
+
+Studio workflow: enter a concrete prompt; choose Full Mix or Multi-Track; choose
+length; verify the displayed model and web balance; press Start; then iterate on
+the one wrong lane or region instead of discarding the whole session. Preserve
+the lane count, credit delta, displayed model, actions, and export type.
+
+The official plugin guide observed on 2026-09-03 describes macOS VST/AU support,
+local Small/Medium processing, and authenticated Stable Audio 3 Large cloud
+generation sharing the web-account credit pool through Stable Sessions. It
+lists Windows and AAX as upcoming. Treat all plugin support as dated and verify
+the installed release rather than projecting web or REST features onto it.
 
 ## Paid-action gate
 
@@ -101,3 +134,8 @@ Never put secrets, private machine paths, private media identifiers, gated
 weights, adapter weights, datasets, or internal organization content in a
 public receipt.
 
+## First-party sources
+
+- Web studio guide: `https://stableaudio.com/docs`
+- First-mix walkthrough: `https://stability.ai/guides/make-your-first-mix-with-stable-audio`
+- Plugin guide: `https://kb.stability.ai/knowledge-base/stable-audio-daw-plugin-guide`

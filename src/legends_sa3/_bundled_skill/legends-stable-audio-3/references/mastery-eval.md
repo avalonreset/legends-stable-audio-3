@@ -30,9 +30,15 @@ operating rules, states evidence limits, and avoids unsafe side effects.
     streaming crossfades, chooses overlap by bars/phrases, and verifies delivery.
 14. **Release audit:** identifies Apache-2.0 source licensing while keeping
     models, adapters, secrets, and third-party dependencies separately licensed.
+15. **Web repair:** keeps a good Multi-Track session, regenerates only the bad
+    lane or replaces the bad time range, distinguishes generative credit actions
+    from free edits/effects, and exports MIXDOWN versus STEMS correctly.
+16. **Interrupted Large job:** uses the generation ID and `large result` to
+    recover without another POST; bounded retries apply only to result GETs,
+    existing files remain protected, and the receipt contains no secret or
+    private absolute path.
 
 Automated distribution checks must also prove that every local Markdown link
 resolves inside the installed skill and that the package contains no private
 machine paths, Empire references, Obsidian wiki links, token-shaped secrets,
 model/adapter weights, or generated audio.
-

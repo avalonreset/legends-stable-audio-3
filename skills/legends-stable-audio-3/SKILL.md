@@ -75,8 +75,9 @@ Keep these four surfaces distinct in every plan and receipt:
 
 1. local Stable Audio 3 Medium;
 2. hosted Stable Audio 3 Large through the Platform REST model ID `stable-audio-3`;
-3. Stable Audio web studio / ST-1;
-4. the Legends downstream mixer or DAW.
+3. Stable Audio web studio (some official KB screens call the engine ST-1);
+4. the Stable Audio DAW plugin;
+5. the Legends downstream mixer or DAW.
 
 Route the operation before choosing tools: use the local CLI for Medium; use an
 authorized Stability Platform client or the guarded `legends-sa3 large`
@@ -99,15 +100,19 @@ generation. Never silently substitute one surface for another.
   window before relying on it. Record the generation ID, request, timestamps,
   response headers, output facts, SHA-256, credit cost, and model label without
   recording `STABILITY_API_KEY`.
-- Treat Platform API credits and Stable Audio web credits as separate pools
-  unless live product evidence proves otherwise. Identify the pool and expected
-  cost before any paid action.
+- Treat Platform API credits and Stable Audio web credits as separate pools.
+  The dated official plugin guide says plugin cloud generations share the web
+  account pool through Stable Sessions; verify that live before spending.
+  Identify the pool and expected cost before any paid action.
 - **Full Mix** means one combined stereo composition. **Multi-Track** means one
   synchronized composition generated as separate instrument lanes or stems.
   Neither means a sequence of completed songs, an automatic DJ mix, or an
   official crossfade duration.
 - A web-studio result is not labeled Large unless live product evidence proves
   that exact tier and version. Preserve its displayed model metadata separately.
+- For web work, read [Surfaces and receipts](references/surfaces-and-receipts.md)
+  for the Full Mix/Multi-Track router, exact generative actions, lane/regeneration
+  workflow, current export controls, dated credit schedule, and plugin boundary.
 - For a Large benchmark, acquire paid source audio only through the Platform
   REST model ID `stable-audio-3`. Do not spend web credits or substitute a
   web-studio result unless the live session explicitly proves the exact Large
