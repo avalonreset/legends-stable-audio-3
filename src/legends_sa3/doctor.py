@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import importlib.util
 import platform
 import shutil
 import subprocess
@@ -17,6 +18,8 @@ class DoctorReport:
     torch: bool
     cuda: bool
     mps: bool
+    stable_audio_runtime: bool
+    flash_attn: bool
     gpu_name: str | None
     vram_gb: float | None
     local_medium_backend: str
@@ -50,6 +53,8 @@ def run_doctor() -> DoctorReport:
         torch=torch_ok,
         cuda=cuda_ok,
         mps=mps_ok,
+        stable_audio_runtime=importlib.util.find_spec("stable_audio_3") is not None,
+        flash_attn=importlib.util.find_spec("flash_attn") is not None,
         gpu_name=gpu_name,
         vram_gb=vram_gb,
         local_medium_backend="cuda" if cuda_ok else "cpu",

@@ -142,18 +142,33 @@ def cmd_doctor(_: argparse.Namespace) -> int:
     print(f"torch: {report.torch}")
     print(f"cuda: {report.cuda}")
     print(f"mps: {report.mps}")
+    print(f"stable_audio_runtime: {report.stable_audio_runtime}")
+    print(f"flash_attn: {report.flash_attn}")
     print(f"gpu: {report.gpu_name or 'not detected'}")
     print(f"vram_gb: {report.vram_gb if report.vram_gb is not None else 'unknown'}")
     print(f"local_medium_backend: {report.local_medium_backend}")
     if report.mps and not report.cuda:
         print("local_medium_note: Apple MPS detected, but this release uses the CPU path; use hosted Large for reliable Mac generation.")
+    if not report.stable_audio_runtime:
+        print(
+            "local_medium_note: official stable_audio_3 runtime is not importable; "
+            "install it or pass --stable-audio-repo to generate"
+        )
+    if report.cuda and not report.flash_attn:
+        print(
+            "local_medium_note: flash_attn is not importable; verify the official "
+            "runtime's current attention requirements before a long render"
+        )
     if report.vram_gb is not None:
         print(f"recommended_track_seconds: {recommend_track_seconds(report.vram_gb)}")
     return 0
 
 
 def cmd_download_model(args: argparse.Namespace) -> int:
-    path = download_model(args.model, Path(args.output))
+    try:
+        path = download_model(args.model, Path(args.output))
+    except (OSError, RuntimeError, ValueError) as error:
+        raise SystemExit(str(error)) from error
     print(f"Downloaded model files to {path}")
     return 0
 

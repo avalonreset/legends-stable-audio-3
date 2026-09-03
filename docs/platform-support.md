@@ -26,8 +26,9 @@ GPU acceleration.
   official Stable Audio runtime and gated model files for local Medium.
 
 Run `legends-sa3 doctor` first. It reports OS, architecture, Python, FFmpeg,
-Torch, CUDA, Apple MPS visibility, VRAM, and the backend this release will
-actually select. Apple MPS may be visible through PyTorch, but the current local
+Torch, CUDA, Apple MPS visibility, the official `stable_audio_3` runtime,
+`flash_attn`, VRAM, and the backend this release will actually select. Apple MPS
+may be visible through PyTorch, but the current local
 runner deliberately selects CPU when CUDA is unavailable; use hosted Large for
 reliable Mac generation unless a future release proves an MPS runtime.
 

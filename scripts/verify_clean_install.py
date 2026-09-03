@@ -23,6 +23,7 @@ def verify_artifact(artifact: Path, label: str) -> None:
         cli = environment / ("Scripts/legends-sa3.exe" if os.name == "nt" else "bin/legends-sa3")
         run([str(python), "-m", "pip", "install", "--disable-pip-version-check", str(artifact)])
         run([str(python), "-c", "import legends_sa3; assert legends_sa3.__version__ == '0.4.0'"])
+        run([str(cli), "--version"])
         run([str(cli), "skill", "validate"])
         install_target = root / "skills"
         run([str(cli), "skill", "install", "--target", str(install_target)])

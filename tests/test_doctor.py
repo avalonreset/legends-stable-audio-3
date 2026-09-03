@@ -13,6 +13,7 @@ class DoctorTests(unittest.TestCase):
             "legends_sa3.doctor.platform.machine", return_value="AMD64"
         ), patch("legends_sa3.doctor.platform.python_version", return_value="3.12.1"), patch(
             "legends_sa3.doctor.shutil.which", return_value="tool"
+        ), patch("legends_sa3.doctor.importlib.util.find_spec", return_value=None
         ):
             report = run_doctor()
         self.assertEqual(report.platform, "windows")
@@ -28,6 +29,7 @@ class DoctorTests(unittest.TestCase):
             "legends_sa3.doctor.platform.machine", return_value="arm64"
         ), patch("legends_sa3.doctor.platform.python_version", return_value="3.12.1"), patch(
             "legends_sa3.doctor.shutil.which", return_value=None
+        ), patch("legends_sa3.doctor.importlib.util.find_spec", return_value=None
         ):
             report = run_doctor()
         self.assertEqual(report.platform, "darwin")
