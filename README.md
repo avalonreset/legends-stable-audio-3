@@ -1,6 +1,8 @@
-# Legends Stable Audio 3
+<p align="left" id="banner">
+  <a href="https://cto-legends.com"><img src="assets/banner.webp" alt="legends-stable-audio-3 — agentic audio production" width="100%"></a>
+</p>
 
-<img src="assets/banner.webp" alt="Legends Stable Audio 3 banner: open-weight music automation, planned like infrastructure." width="100%">
+# legends-stable-audio-3
 
 [![CI](https://github.com/avalonreset/legends-stable-audio-3/actions/workflows/ci.yml/badge.svg)](https://github.com/avalonreset/legends-stable-audio-3/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/avalonreset/legends-stable-audio-3)](https://github.com/avalonreset/legends-stable-audio-3/releases/latest)
@@ -13,7 +15,7 @@ Give Codex, Grok, Claude, or Gemini a portable operating brain for Stable Audio
 3—then use the same guarded CLI for local Medium, hosted Large, and long-form
 audio production. No private vault or Obsidian setup is required.
 
-Legends Stable Audio 3 keeps local Medium, hosted Large, the Stable Audio web
+legends-stable-audio-3 keeps local Medium, hosted Large, the Stable Audio web
 studio, the DAW plugin, and downstream mixing distinct. Its CLI handles local
 model access, setup, prompting, VRAM-aware planning, generation, resumable
 batches, guarded paid API jobs, and final audio assembly. One supported workflow
@@ -287,7 +289,7 @@ Run `legends-sa3 plan --hours 1 --vram-gb 16` to see the exact segment count.
 ## Prompt-First Workflow
 
 Stable Audio 3 responds best to concrete musical language: genre, instruments,
-mood or energy, BPM, and production character. Legends Stable Audio 3 therefore
+mood or energy, BPM, and production character. legends-stable-audio-3 therefore
 uses free-form `--style` prompts as the primary workflow.
 
 Recipes are optional scaffolds for repeatable batches. They are not a catalog of
@@ -419,7 +421,7 @@ under [Apache License 2.0](LICENSE). `NOTICE`, `THIRD_PARTY_NOTICES.md`, and
 services, datasets, adapters, generated media, and third-party components retain
 their separate terms.
 
-Legends Stable Audio 3 is an independent compatibility project. It is not
+legends-stable-audio-3 is an independent compatibility project. It is not
 affiliated with, sponsored by, or endorsed by Stability AI. Stability AI and
 Stable Audio names identify compatible services and models; their marks remain
 with their respective owners.
