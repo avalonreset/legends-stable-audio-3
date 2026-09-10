@@ -9,7 +9,9 @@ is exercised during local release preparation.
 `pyproject.toml` is the dependency source of truth and `uv.lock` is the
 cross-platform resolution lock. Release checks use uv 0.11.x and must run with
 `--frozen`; a release PR that changes dependency declarations must intentionally
-regenerate and review `uv.lock`.
+regenerate and review `uv.lock`. Dependabot watches the `uv` ecosystem so version
+bumps update the pin and lockfile together. The `pip` ecosystem is not used,
+because it would edit `pyproject.toml` and leave `uv.lock` stale.
 
 ```powershell
 uv lock
