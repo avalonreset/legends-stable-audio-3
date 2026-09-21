@@ -7,9 +7,15 @@
 [![checks](https://img.shields.io/github/actions/workflow/status/avalonreset/legends-stable-audio-3/ci.yml?branch=main&label=checks&style=flat-square&labelColor=000000)](https://github.com/avalonreset/legends-stable-audio-3/actions/workflows/ci.yml)
 [![license](https://img.shields.io/github/license/avalonreset/legends-stable-audio-3?label=license&style=flat-square&labelColor=000000&color=666666)](LICENSE)
 
-Give Codex, Grok, Claude, or Gemini a portable operating brain for Stable Audio
-3—then use the same guarded CLI for local Medium, hosted Large, and long-form
-audio production. No private vault or Obsidian setup is required.
+Run Stable Audio 3 with an agent: turn a creative brief into prompts and a
+hardware-aware plan, generate resumable batches, and assemble verified continuous
+mixes. The same toolkit supports local Medium and guarded hosted Large jobs.
+Its operating instructions travel with the installed skill.
+
+[first run](docs/first-run.md) · [install](#install-the-agent-skill) ·
+[choose a surface](#choose-your-surface) · [local generation](#local-medium-quick-start) ·
+[mixing](#long-duration-assembly) · [troubleshooting](docs/troubleshooting.md) ·
+[all guides](#documentation)
 
 <p align="left">
   <a href="https://www.youtube.com/watch?v=ZMF28c_M7OU">
@@ -67,6 +73,10 @@ link back to a private development vault.
 | Analyze or assemble existing tracks | Active-cue analysis and streaming crossfade mixer |
 
 ## Install the agent skill
+
+**Try the planner before downloading a model.** The [first-run guide](docs/first-run.md)
+checks the installed skill, previews a prompt, and calculates a ten-hour mix on
+an ordinary CPU. These steps require no GPU, model weights, or paid API account.
 
 ### Source checkout
 
