@@ -20,7 +20,9 @@ marks remain the property of their respective owners.
 ## `stable-audio-3-youtube.png`
 
 - Source: https://www.youtube.com/watch?v=ZMF28c_M7OU (avalon-reset)
-- Frame: 00:25.000 from the owner's full-quality video master
+- Frame: 01:25.900 from the owner's full-quality video master
+- Selection: the owner's chosen "generate 60 hours of music" passage; the
+  visible caption beat reads "THERE AND GENERATE / 60 HOURS OF"
 - Format: native 2160 x 2160 PNG, displayed at 560 x 560 in the README
 - Method: single-frame extraction without cropping, stretching, or rearranging
 - Publication: requested by the video owner for the linked README preview
