@@ -1,15 +1,11 @@
-<p align="left" id="banner">
-  <a href="https://cto-legends.com"><img src="assets/banner.webp" alt="legends-stable-audio-3: agent-run audio production, from custom models to continuous mixes" width="100%"></a>
-</p>
+<a name="banner"></a>
+<a name="legends-stable-audio-3"></a>
 
-# legends-stable-audio-3
+# ![legends-stable-audio-3](assets/banner.webp)
 
-[![CI](https://github.com/avalonreset/legends-stable-audio-3/actions/workflows/ci.yml/badge.svg)](https://github.com/avalonreset/legends-stable-audio-3/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/v/release/avalonreset/legends-stable-audio-3)](https://github.com/avalonreset/legends-stable-audio-3/releases/latest)
-[![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
-![Python](https://img.shields.io/badge/python-3.10%2B-3776AB)
-![Agents](https://img.shields.io/badge/agents-Codex%20%7C%20Grok%20%7C%20Claude%20%7C%20Gemini-111827)
-[![CTO Legends](https://img.shields.io/badge/CTO-Legends-E10600)](https://cto-legends.com)
+[![release](https://img.shields.io/github/v/release/avalonreset/legends-stable-audio-3?label=release&sort=date&style=flat-square&labelColor=000000&color=ff0000)](https://github.com/avalonreset/legends-stable-audio-3/releases/latest)
+[![checks](https://img.shields.io/github/actions/workflow/status/avalonreset/legends-stable-audio-3/ci.yml?branch=main&label=checks&style=flat-square&labelColor=000000)](https://github.com/avalonreset/legends-stable-audio-3/actions/workflows/ci.yml)
+[![license](https://img.shields.io/github/license/avalonreset/legends-stable-audio-3?label=license&style=flat-square&labelColor=000000&color=666666)](LICENSE)
 
 Give Codex, Grok, Claude, or Gemini a portable operating brain for Stable Audio
 3—then use the same guarded CLI for local Medium, hosted Large, and long-form
