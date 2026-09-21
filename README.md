@@ -1,5 +1,5 @@
 <p align="left" id="banner">
-  <a href="https://cto-legends.com"><img src="assets/banner.webp" alt="legends-stable-audio-3 — agentic audio production" width="100%"></a>
+  <a href="https://cto-legends.com"><img src="assets/banner.webp" alt="legends-stable-audio-3: agent-run audio production, from custom models to continuous mixes" width="100%"></a>
 </p>
 
 # legends-stable-audio-3

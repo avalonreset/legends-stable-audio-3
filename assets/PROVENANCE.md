@@ -1,11 +1,12 @@
 # Asset provenance
 
-## `banner.webp`
+## `banner.webp` and `banner.png`
 
-- Product: Legends Stable Audio 3
-- Created: 2026-09-02 during public-release preparation
-- Method: AI-assisted transformation of the project's existing banner to apply
-  the current product name and release branding
+- Product: legends-stable-audio-3
+- Updated: 2026-09-20 with founder-approved banner copy and typography
+- Method: deterministic typography rendering using Legends Regular, with
+  literal character layout, on a 4096 x 1024 black canvas
+- Copy: agent-run audio production, from custom models to continuous mixes
 - Rights designation: project-owned current banner, as confirmed by the founder
 - License: Apache License 2.0, the same license as the project-owned source
 - Integrity: record the final SHA-256 in the release receipt and artifact manifest
