@@ -16,3 +16,14 @@ weights, adapters, datasets, generated audio, or Stability AI assets. Its use of
 the words “Stable Audio 3” identifies compatibility and does not claim
 affiliation with, sponsorship by, or endorsement from Stability AI. Third-party
 marks remain the property of their respective owners.
+
+## `stable-audio-3-youtube.png`
+
+- Source: https://www.youtube.com/watch?v=ZMF28c_M7OU (avalon-reset)
+- Frame: 00:25.000 from the owner's full-quality video master
+- Format: native 2160 x 2160 PNG, displayed at 560 x 560 in the README
+- Method: single-frame extraction without cropping, stretching, or rearranging
+- Publication: requested by the video owner for the linked README preview
+
+The preview links to the original YouTube walkthrough. Third-party interfaces
+and trademarks visible in the frame remain the property of their owners.

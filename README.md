@@ -11,6 +11,15 @@ Give Codex, Grok, Claude, or Gemini a portable operating brain for Stable Audio
 3—then use the same guarded CLI for local Medium, hosted Large, and long-form
 audio production. No private vault or Obsidian setup is required.
 
+<p align="left">
+  <a href="https://www.youtube.com/watch?v=ZMF28c_M7OU">
+    <img src="assets/stable-audio-3-youtube.png" alt="stable-audio-3 music production walkthrough — watch on YouTube" width="560" height="560">
+  </a>
+</p>
+<p align="left">
+  <a href="https://www.youtube.com/watch?v=ZMF28c_M7OU"><em>just use freaking stable-audio-3 for all of your music beds from now on</em></a>
+</p>
+
 legends-stable-audio-3 keeps local Medium, hosted Large, the Stable Audio web
 studio, the DAW plugin, and downstream mixing distinct. Its CLI handles local
 model access, setup, prompting, VRAM-aware planning, generation, resumable
