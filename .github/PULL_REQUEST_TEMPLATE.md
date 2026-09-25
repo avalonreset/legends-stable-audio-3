@@ -3,9 +3,9 @@
 ## Validation
 
 - [ ] Tests pass.
-- [ ] `python scripts/sync_skill_adapters.py` and release checks pass.
+- [ ] `python scripts/release_checks.py` passes.
 - [ ] No model weights, adapters, datasets, secrets, or generated media are tracked.
 - [ ] Docs updated for user-facing changes.
-- [ ] Canonical skill, packaged bundle, and repo-only mirrors still agree across Codex, Grok, Claude, and Gemini.
+- [ ] `skills/` still holds only the pinned `cto-legends` copy; no module skill, mirrors, or shims added.
 - [ ] License, NOTICE, third-party notices, and provenance were updated when needed.
 - [ ] A clean wheel/source install was considered for packaging changes.

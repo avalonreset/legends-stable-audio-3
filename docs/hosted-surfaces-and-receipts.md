@@ -20,10 +20,10 @@ finished songs or an automatic DJ mix.
 
 For the exact Stable Audio 3 request schema, REST endpoints, asynchronous poll
 flow, and guarded `legends-sa3 large` commands, read the portable
-[`large-api.md`](../skills/legends-stable-audio-3/references/large-api.md)
+[`large-api.md`](../src/legends_sa3/_bundled_skill/legends-stable-audio-3/references/large-api.md)
 reference.
 
-The portable [surfaces reference](../skills/legends-stable-audio-3/references/surfaces-and-receipts.md)
+The portable [surfaces reference](../src/legends_sa3/_bundled_skill/legends-stable-audio-3/references/surfaces-and-receipts.md)
 also carries the live-checked web workflow: Full Mix versus agent-arranged
 Multi-Track, four-lane session limit, Add/Regenerate/Replace/Extend actions,
 free tape/splice/effect operations, MIXDOWN/STEMS export, dated web credit costs,

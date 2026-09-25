@@ -25,12 +25,6 @@ class SourceExportTests(unittest.TestCase):
             self.assertEqual(created.returncode, 0, created.stdout + created.stderr)
             self.assertFalse((export / ".git").exists())
 
-            skill = subprocess.run(
-                [sys.executable, "scripts/sync_skill_adapters.py"],
-                cwd=export,
-                text=True,
-                capture_output=True,
-            )
             release = subprocess.run(
                 [sys.executable, "scripts/release_checks.py"],
                 cwd=export,
@@ -38,7 +32,6 @@ class SourceExportTests(unittest.TestCase):
                 capture_output=True,
             )
 
-            self.assertEqual(skill.returncode, 0, skill.stdout + skill.stderr)
             self.assertEqual(release.returncode, 0, release.stdout + release.stderr)
 
     def test_export_refuses_existing_target(self):

@@ -6,7 +6,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from sync_skill_adapters import ROOT, git_release_files
+from release_checks import ROOT, git_release_files
 
 
 def export_public_source(output: Path) -> Path:
@@ -24,10 +24,7 @@ def export_public_source(output: Path) -> Path:
         destination.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(source, destination)
 
-    checks = (
-        [sys.executable, "scripts/sync_skill_adapters.py"],
-        [sys.executable, "scripts/release_checks.py"],
-    )
+    checks = ([sys.executable, "scripts/release_checks.py"],)
     for command in checks:
         result = subprocess.run(command, cwd=output, text=True, capture_output=True)
         if result.returncode:
@@ -47,7 +44,7 @@ def main() -> int:
     except (FileExistsError, RuntimeError) as error:
         raise SystemExit(str(error)) from error
     print(f"public source export: {exported}")
-    print("validation: skill package ok; release checks ok; no Git history copied")
+    print("validation: release checks ok; no Git history copied")
     return 0
 
 

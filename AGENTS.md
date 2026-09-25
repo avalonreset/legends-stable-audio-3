@@ -7,9 +7,11 @@ studio, and downstream mixing. The repository CLI directly covers local setup,
 prompt planning, VRAM-aware generation, batches, analysis, and crossfaded MP3
 assembly.
 
-The canonical cross-platform operating skill is
-`skills/legends-stable-audio-3/SKILL.md`. Keep generated skill mirrors in sync
-with `python scripts/sync_skill_adapters.py --sync`; do not hand-edit mirrors.
+The repo vendors the pinned `cto-legends` router skill at
+`skills/cto-legends/SKILL.md` and registers no per-module skill. The
+installable Python package ships its own operating bundle (see
+`src/legends_sa3/skill_distribution.py`); do not add skill mirrors or shims
+to the repo root.
 
 ## Safety and licensing boundaries
 

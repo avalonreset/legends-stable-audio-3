@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "legends-stable-audio-3"
-version = "0.4.1"
+version = "0.1.0"
 description = "Agentic Stable Audio 3 operator for model access, prompting, generation, VRAM planning, and crossfaded mixes"
 readme = "README.md"
 requires-python = ">=3.10"

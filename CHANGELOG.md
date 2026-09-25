@@ -2,6 +2,17 @@
 
 All notable changes to `legends-stable-audio-3` will be documented here.
 
+## 0.1.0 - 2026-09-25
+
+Router-native reset: the repo now vendors a pinned copy of the single
+`cto-legends` router skill at `skills/cto-legends/SKILL.md` and no longer
+registers `legends-stable-audio-3` as its own skill. Removed
+`skills/legends-stable-audio-3`, the `.agents/skills` and `.claude/skills`
+mirrors, the `CLAUDE.md`/`GEMINI.md`/`GROK.md` shims,
+`gemini-extension.json`, `skill-package.json`, and the mirror-sync script.
+The installable Python bundle (`legends-sa3 skill validate/install`) is
+unchanged. Version reset to `0.1.0` as the router-native generation marker.
+
 ## 0.4.1 - 2026-09-03
 
 ### Changed

@@ -12,6 +12,12 @@ hardware-aware plan, generate resumable batches, and assemble verified continuou
 mixes. The same toolkit supports local Medium and guarded hosted Large jobs.
 Its operating instructions travel with the installed skill.
 
+## Agent setup (via `cto-legends`)
+
+Part of the [CTO Legends](https://github.com/avalonreset/cto-legends) ecosystem. `cto-legends` is the only registered skill; this repo vendors a pinned copy at `skills/cto-legends/SKILL.md`.
+
+Install with `cto-legends install legends-stable-audio-3`, then follow the module recipe the router loads. Do not register this module as its own skill.
+
 [first run](docs/first-run.md) · [install](#install-the-agent-skill) ·
 [choose a surface](#choose-your-surface) · [local generation](#local-medium-quick-start) ·
 [mixing](#long-duration-assembly) · [troubleshooting](docs/troubleshooting.md) ·
@@ -80,20 +86,21 @@ an ordinary CPU. These steps require no GPU, model weights, or paid API account.
 
 ### Source checkout
 
-Clone the repository and open that directory in Codex, Grok, Claude Code, or
-Gemini CLI. The repository includes `AGENTS.md`, `GROK.md`, `CLAUDE.md`,
-`GEMINI.md`, and one synchronized canonical skill:
+Clone the repository and open that directory in your agent client.
+`AGENTS.md` holds build and test instructions. The repo vendors the pinned
+`cto-legends` router skill at `skills/cto-legends/SKILL.md`; it registers no
+per-module skill of its own.
 
 ```bash
 git clone https://github.com/avalonreset/legends-stable-audio-3.git
 cd legends-stable-audio-3
 ```
 
-To install the packaged skill into a configured directory-based Agent Skills
-target, install the release wheel and choose the target explicitly:
+To install the packaged operating bundle into a configured directory-based
+Agent Skills target, install the release wheel and choose the target explicitly:
 
 ```bash
-python -m pip install "https://github.com/avalonreset/legends-stable-audio-3/releases/download/v0.4.1/legends_stable_audio_3-0.4.1-py3-none-any.whl"
+python -m pip install "https://github.com/avalonreset/legends-stable-audio-3/releases/download/v0.1.0/legends_stable_audio_3-0.1.0-py3-none-any.whl"
 legends-sa3 skill validate
 legends-sa3 skill install --target <skills-directory>
 ```
@@ -355,45 +362,18 @@ before rendering if any track has cue-analysis warnings.
 
 ## Agent support
 
-The canonical repository source is `skills/legends-stable-audio-3`. The wheel
-ships a generated, byte-identical copy so agent installation remains available
-after `pip install`. Repository mirrors are integration fixtures for source
-checkouts; they are not separate skill sources and must not drift:
+`cto-legends` is the only registered skill; this repo vendors a pinned copy at
+`skills/cto-legends/SKILL.md` and registers no per-module skill. The wheel
+ships the operating bundle so agent installation remains available after
+`pip install`.
 
-The installed skill also carries its own `references/` library: prompt and
+The installed bundle also carries its own `references/` library: prompt and
 duration tournaments, BPM decisions, SFX and spoken-word-bed practice, exact
 Large REST request/polling flow, paid-action receipts, matched A/B boundaries, long-mix policy, adapter
-escalation, licensing boundaries, and a portable mastery eval. Users do not
-need this project's private development vault—or Obsidian at all—to receive the
-operating method.
-
-- Codex: `AGENTS.md` plus the `.agents/skills/` mirror.
-- Grok: `GROK.md` plus the portable Agent Skills package when supported by the
-  active client.
-- Claude: `CLAUDE.md` plus the `.claude/skills/` mirror.
-- Gemini: `GEMINI.md` plus `gemini-extension.json`.
+escalation, licensing boundaries, and a portable mastery eval.
 
 The agent instructions all route users toward the same safe workflow:
 doctor, model access, prompt planning, generate, optional mix, verify.
-
-Validate all adapters:
-
-```powershell
-python scripts\sync_skill_adapters.py
-```
-
-Synchronize generated mirrors after editing the canonical source:
-
-```powershell
-python scripts\sync_skill_adapters.py --sync
-```
-
-After a source checkout, install the canonical package into an explicit
-directory-based Agent Skills target:
-
-```powershell
-python scripts\sync_skill_adapters.py --install-target <skills-directory>
-```
 
 After installing the Python package, use the shipped bundle without needing a
 repository checkout:
@@ -403,9 +383,9 @@ legends-sa3 skill validate
 legends-sa3 skill install --target <skills-directory>
 ```
 
-Both installers require an explicit parent directory and refuse to replace an
-existing `legends-stable-audio-3` folder. They never guess or modify global
-Codex, Grok, Claude, or Gemini locations.
+The installer requires an explicit parent directory and refuses to replace an
+existing `legends-stable-audio-3` folder. It never guesses or modifies global
+agent locations.
 
 ## Documentation
 
@@ -418,7 +398,7 @@ Codex, Grok, Claude, or Gemini locations.
 - [Agent compatibility](docs/agent-compatibility.md)
 - [Windows, Linux, and macOS support](docs/platform-support.md)
 - [Hosted surfaces and receipts](docs/hosted-surfaces-and-receipts.md)
-- [Stable Audio 3 Large REST reference](skills/legends-stable-audio-3/references/large-api.md)
+- [Stable Audio 3 Large REST reference](src/legends_sa3/_bundled_skill/legends-stable-audio-3/references/large-api.md)
 - [Commercial use and license notes](docs/commercial-use-and-license.md)
 - [Apache-2.0 decision and rights record](docs/source-license-decision.md)
 - [Dependency and reproducibility policy](docs/dependency-policy.md)
@@ -427,7 +407,7 @@ Codex, Grok, Claude, or Gemini locations.
 
 ## Status
 
-Current package version: `v0.4.1`. The project is public and the current release
+Current package version: `v0.1.0`. The project is public and the current release
 is available from [GitHub Releases](https://github.com/avalonreset/legends-stable-audio-3/releases/latest).
 
 Project-owned source, documentation, tests, and the current banner are licensed

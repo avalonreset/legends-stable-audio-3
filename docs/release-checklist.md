@@ -32,15 +32,12 @@
 
 ## Skill distribution
 
-- Edit only `skills/legends-stable-audio-3` as the canonical skill source.
-- Run `python scripts/sync_skill_adapters.py --sync`, then run it without flags
-  and require `skill package: ok`.
-- Confirm the repo-only `.agents/` and `.claude/` mirrors and the packaged bundle
-  are byte-identical to the canonical source.
+- Confirm `skills/` holds only the pinned `cto-legends` router copy, with no
+  per-module skill, mirrors, or shims.
 - From a clean package install, run `legends-sa3 skill validate` and
   `legends-sa3 skill install --target <temporary-directory>`.
-- Confirm installers require an explicit target, refuse overwrite, and never
-  infer global Codex, Grok, Claude, or Gemini locations.
+- Confirm the installer requires an explicit target, refuses overwrite, and never
+  infers global agent locations.
 
 ## Code, source export, and build
 
@@ -49,7 +46,6 @@ $env:PYTHONPATH = "$PWD\src"
 $env:PYTHONDONTWRITEBYTECODE = "1"
 python -m unittest discover -s tests
 python -m legends_sa3 plan --hours 10 --vram-gb 24 --crossfade 12
-python scripts\sync_skill_adapters.py
 python scripts\release_checks.py
 python scripts\export_public_source.py --output <new-empty-sibling-directory>
 uv run --frozen --group release ruff check src tests scripts
@@ -64,7 +60,7 @@ git diff --check
   repository metadata.
 - Create the public repository from the validated Git-less export, not from the
   private remote or its history. The exporter refuses an existing target and
-  reruns skill and release validation inside the new snapshot.
+  reruns release validation inside the new snapshot.
 - Inspect both sdist and wheel. Require LICENSE, NOTICE, third-party notices, and
   the bundled skill; reject model/adapter/audio/local-state artifacts.
 - Confirm the 10-hour plan remains 98 tracks and 36,076 final seconds.

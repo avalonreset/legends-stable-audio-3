@@ -1,7 +1,4 @@
-import json
 import re
-import subprocess
-import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -41,66 +38,17 @@ class SkillDistributionTests(unittest.TestCase):
             with self.assertRaises(FileExistsError):
                 install_bundled_skill(target)
 
-    def test_canonical_skill_and_mirrors_are_identical(self):
-        manifest = json.loads((ROOT / "skill-package.json").read_text(encoding="utf-8"))
-        canonical = ROOT / manifest["canonical"]
-        expected = {
-            path.relative_to(canonical).as_posix(): path.read_bytes()
-            for path in canonical.rglob("*")
-            if path.is_file()
-        }
-
-        for mirror in manifest["mirrors"].values():
-            mirror_root = ROOT / mirror
-            actual = {
-                path.relative_to(mirror_root).as_posix(): path.read_bytes()
-                for path in mirror_root.rglob("*")
-                if path.is_file()
-            }
-            self.assertEqual(actual, expected, mirror)
-
-    def test_release_skill_validator_passes(self):
-        result = subprocess.run(
-            [sys.executable, "scripts/sync_skill_adapters.py"],
-            cwd=ROOT,
-            text=True,
-            capture_output=True,
-        )
-
-        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        self.assertIn("skill package: ok", result.stdout)
-
-    def test_install_target_gets_complete_canonical_package(self):
-        manifest = json.loads((ROOT / "skill-package.json").read_text(encoding="utf-8"))
-        canonical = ROOT / manifest["canonical"]
-        with tempfile.TemporaryDirectory() as temp:
-            result = subprocess.run(
-                [
-                    sys.executable,
-                    "scripts/sync_skill_adapters.py",
-                    "--install-target",
-                    temp,
-                ],
-                cwd=ROOT,
-                text=True,
-                capture_output=True,
-            )
-            installed = Path(temp) / manifest["name"]
-
-            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-            self.assertEqual(
-                {
-                    path.relative_to(installed).as_posix(): path.read_bytes()
-                    for path in installed.rglob("*")
-                    if path.is_file()
-                },
-                {
-                    path.relative_to(canonical).as_posix(): path.read_bytes()
-                    for path in canonical.rglob("*")
-                    if path.is_file()
-                },
-            )
-            self.assert_portable_skill(installed)
+    def test_repo_registers_no_module_skill(self):
+        # Router-native reset: the repo must not register
+        # legends-stable-audio-3 as its own skill. Only the pinned
+        # cto-legends router copy may live under skills/.
+        self.assertFalse((ROOT / "skills" / "legends-stable-audio-3").exists())
+        self.assertFalse((ROOT / "SKILL.md").is_file())
+        self.assertFalse((ROOT / "skill-package.json").is_file())
+        for mirror in (ROOT / ".agents" / "skills", ROOT / ".claude" / "skills"):
+            self.assertFalse(mirror.is_dir() and any(mirror.iterdir()))
+        vendored = ROOT / "skills" / "cto-legends" / "SKILL.md"
+        self.assertTrue(vendored.is_file())
 
 
 if __name__ == "__main__":

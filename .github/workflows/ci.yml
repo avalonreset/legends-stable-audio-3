@@ -40,8 +40,6 @@ jobs:
         env:
           PYTHONDONTWRITEBYTECODE: "1"
         run: python -m unittest discover -s tests
-      - name: Validate canonical skill and mirrors
-        run: python scripts/sync_skill_adapters.py
       - name: Validate release tree
         run: python scripts/release_checks.py
       - name: Verify 10-hour plan

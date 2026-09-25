@@ -8,7 +8,7 @@ does not generate audio, download weights, or spend API credits.
 Use Python 3.10 or newer in a virtual environment. Install the release wheel:
 
 ```sh
-python -m pip install "https://github.com/avalonreset/legends-stable-audio-3/releases/download/v0.4.1/legends_stable_audio_3-0.4.1-py3-none-any.whl"
+python -m pip install "https://github.com/avalonreset/legends-stable-audio-3/releases/download/v0.1.0/legends_stable_audio_3-0.1.0-py3-none-any.whl"
 legends-sa3 skill validate
 legends-sa3 prompt --style "warm dub techno, tape chords, deep bass, 118 BPM" --count 1
 legends-sa3 plan --hours 10 --vram-gb 24 --crossfade 12
@@ -25,9 +25,10 @@ from the checkout, then run the same commands.
 
 ## hand the plan to your agent
 
-Open [the canonical skill](../skills/legends-stable-audio-3/SKILL.md) in an agent
-with file and command access, or install it into your client's chosen skill
-directory with `legends-sa3 skill install --target <skills-directory>`.
+Open [the vendored router skill](../skills/cto-legends/SKILL.md) in an agent
+with file and command access, or install the operating bundle into your
+client's chosen skill directory with
+`legends-sa3 skill install --target <skills-directory>`.
 
 For example:
 
@@ -43,7 +44,7 @@ The installer refuses to overwrite an existing skill. See
 | you want | next step | extra requirements |
 |---|---|---|
 | local Medium generation | [model access](model-access.md), then [README quick start](../README.md#local-medium-quick-start) | gated model approval, model files, runtime and suitable hardware |
-| hosted Large generation | [Large reference](../skills/legends-stable-audio-3/references/large-api.md) | provider account, current pricing, explicit paid confirmation |
+| hosted Large generation | [Large reference](../src/legends_sa3/_bundled_skill/legends-stable-audio-3/references/large-api.md) | provider account, current pricing, explicit paid confirmation |
 | a continuous master from existing tracks | [mix workflow](music-factory.md) | local audio files and FFmpeg/FFprobe |
 | custom native adapters | [adapter guide](lora-adapters.md) | compatible adapter checkpoint and local model runtime |
 

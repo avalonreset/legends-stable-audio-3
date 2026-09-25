@@ -3,15 +3,67 @@ from __future__ import annotations
 import argparse
 import hashlib
 import re
+import subprocess
 import sys
 import tarfile
 import zipfile
 from pathlib import Path
 
-from sync_skill_adapters import FORBIDDEN_RELEASE_SUFFIXES, git_release_files
-
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "0.4.1"
+VERSION = "0.1.0"
+FORBIDDEN_RELEASE_SUFFIXES = {
+    ".bin",
+    ".ckpt",
+    ".flac",
+    ".mp3",
+    ".onnx",
+    ".pt",
+    ".pth",
+    ".safetensors",
+    ".wav",
+}
+FALLBACK_EXCLUDED_PARTS = {
+    ".git",
+    ".legends",
+    ".mypy_cache",
+    ".pytest_cache",
+    ".ruff_cache",
+    ".venv",
+    ".release-venv",
+    "__pycache__",
+    "build",
+    "dist",
+    "models",
+    "output",
+    "runs",
+    "tmp",
+}
+
+
+def git_release_files(root: Path = ROOT) -> list[Path]:
+    if not (root / ".git").exists():
+        return sorted(
+            path.relative_to(root)
+            for path in root.rglob("*")
+            if path.is_file()
+            and not any(part in FALLBACK_EXCLUDED_PARTS or part.endswith(".egg-info") for part in path.relative_to(root).parts)
+        )
+    commands = (
+        ["git", "ls-files", "-z"],
+        ["git", "ls-files", "--others", "--exclude-standard", "-z"],
+    )
+    paths: set[Path] = set()
+    for command in commands:
+        result = subprocess.run(
+            command,
+            cwd=root,
+            check=True,
+            capture_output=True,
+        )
+        for raw in result.stdout.split(b"\0"):
+            if raw:
+                paths.add(Path(raw.decode("utf-8")))
+    return sorted(paths)
 PUBLIC_URL = "https://github.com/avalonreset/legends-stable-audio-3"
 APACHE_LICENSE_SHA256 = "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
 REQUIRED_FILES = (
@@ -24,13 +76,9 @@ REQUIRED_FILES = (
     "docs/platform-support.md",
     "scripts/export_public_source.py",
     "src/legends_sa3/hosted.py",
-    "skills/legends-stable-audio-3/SKILL.md",
-    "skills/legends-stable-audio-3/references/prompt-mastery.md",
-    "skills/legends-stable-audio-3/references/surfaces-and-receipts.md",
-    "skills/legends-stable-audio-3/references/mixing-and-adapters.md",
-    "skills/legends-stable-audio-3/references/licensing-and-dependencies.md",
-    "skills/legends-stable-audio-3/references/large-api.md",
-    "skills/legends-stable-audio-3/references/mastery-eval.md",
+    "skills/cto-legends/SKILL.md",
+    ".legends-module",
+    ".github/workflows/contract.yml",
 )
 ACTIVE_STALE_PATTERNS = {
     "legends-stable-audio-3.0": "retired point-oh slug",
@@ -52,7 +100,6 @@ HISTORICAL_RELEASES = {
 }
 STALE_SCAN_EXCLUSIONS = {
     Path("scripts/release_checks.py"),
-    Path("scripts/sync_skill_adapters.py"),
 }
 SECRET_PATTERNS = (
     re.compile(r"\bhf_[A-Za-z0-9]{20,}\b"),
@@ -78,9 +125,8 @@ def validate_tree(root: Path = ROOT) -> list[str]:
     version_surfaces = {
         "pyproject.toml": f'version = "{VERSION}"',
         "src/legends_sa3/__init__.py": f'__version__ = "{VERSION}"',
-        "gemini-extension.json": f'"version": "{VERSION}"',
         "CITATION.cff": f'version: "{VERSION}"',
-        "docs/releases/v0.4.1.md": "# v0.4.1 - Public Onboarding Polish",
+        "CHANGELOG.md": f"## {VERSION}",
     }
     for relative, marker in version_surfaces.items():
         path = root / relative
@@ -191,20 +237,8 @@ def validate_archive(path: Path) -> list[str]:
         required_suffixes.extend(
             [
                 "/agents.md",
-                "/claude.md",
-                "/gemini.md",
-                "/grok.md",
-                "/gemini-extension.json",
-                "/.agents/skills/legends-stable-audio-3/skill.md",
-                "/.claude/skills/legends-stable-audio-3/skill.md",
-                "/skills/legends-stable-audio-3/skill.md",
-                "/skills/legends-stable-audio-3/agents/openai.yaml",
-                "/skills/legends-stable-audio-3/references/licensing-and-dependencies.md",
-                "/skills/legends-stable-audio-3/references/large-api.md",
-                "/skills/legends-stable-audio-3/references/prompt-mastery.md",
-                "/skills/legends-stable-audio-3/references/surfaces-and-receipts.md",
-                "/skills/legends-stable-audio-3/references/mixing-and-adapters.md",
-                "/skills/legends-stable-audio-3/references/mastery-eval.md",
+                "/skills/cto-legends/skill.md",
+                "/.legends-module",
                 "/src/legends_sa3/_bundled_skill/legends-stable-audio-3/skill.md",
                 "/src/legends_sa3/_bundled_skill/legends-stable-audio-3/agents/openai.yaml",
                 "/src/legends_sa3/_bundled_skill/legends-stable-audio-3/references/licensing-and-dependencies.md",

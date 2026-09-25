@@ -23,14 +23,13 @@ python -m unittest discover -s tests
 - Keep generated audio out of the repo unless a maintainer explicitly approves it.
 - Update docs when changing user-facing commands.
 - Update tests when changing planning or mixing behavior.
-- Edit `skills/legends-stable-audio-3` as the canonical agent skill. Run
-  `python scripts/sync_skill_adapters.py --sync` instead of hand-editing mirrors.
+- Do not register the module as its own skill. `skills/` holds only the pinned
+  `cto-legends` router copy; never add mirrors or host shims.
 
 ## Pull request checklist
 
 - Tests pass.
 - `legends-sa3 plan --hours 10 --vram-gb 24 --crossfade 12` still returns 98 tracks.
-- `python scripts/sync_skill_adapters.py` reports `skill package: ok`.
 - `python scripts/release_checks.py` passes.
 - No model, adapter, dataset, secret, or generated-media artifact is tracked.
 - Docs mention any changed setup or workflow behavior.
