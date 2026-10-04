@@ -57,8 +57,8 @@ method:
 1. Route the request to local Medium, hosted Large, the web studio, the plugin,
    or downstream mixing without silently substituting one for another.
 2. Turn the creative brief into concrete musical metadata plus concise prose.
-3. Use short prompt-family and seed tournaments before committing GPU time or
-   paid credits.
+3. Calibrate hosted full songs at 380 seconds before expanding the paid batch;
+   keep local hardware trials and short-cue requests distinct.
 4. Choose duration, BPM, steps, CFG, and VRAM-aware segment sizes deliberately.
 5. Preserve source audio, generation IDs, hashes, and resumable public-safe
    receipts.
@@ -100,7 +100,7 @@ To install the packaged operating bundle into a configured directory-based
 Agent Skills target, install the release wheel and choose the target explicitly:
 
 ```bash
-python -m pip install "https://github.com/avalonreset/legends-stable-audio-3/releases/download/v0.1.1/legends_stable_audio_3-0.1.1-py3-none-any.whl"
+python -m pip install "https://github.com/avalonreset/legends-stable-audio-3/releases/download/v0.1.2/legends_stable_audio_3-0.1.2-py3-none-any.whl"
 legends-sa3 skill validate
 legends-sa3 skill install --target <skills-directory>
 ```
@@ -182,7 +182,7 @@ Preview a hosted Stable Audio 3 Large REST request without spending credits:
 legends-sa3 large plan `
   --operation text-to-audio `
   --prompt "TrackType: Music, VocalType: Instrumental, deep dub techno, 118 BPM" `
-  --duration 120 --seed 42 --steps 8 --cfg-scale 1 --output-format wav
+  --duration 380 --seed 42 --steps 8 --cfg-scale 1 --output-format wav
 ```
 
 After verifying live Platform pricing and balance, load `STABILITY_API_KEY`
@@ -344,6 +344,29 @@ the same creative lane, and streaming them into one master with smooth crossfade
 That gives users a practical way to create long background beds without looping
 the same song for hours.
 
+## Full-song hosted production
+
+Hosted Large full songs default to 380 seconds. Generate one full-length
+candidate before expanding; preserve and reuse good recordings. Short cues and
+SFX use an explicit duration. The upstream API's omitted default remains 190s.
+
+```sh
+legends-sa3 production-plan --minutes 20
+legends-sa3 arrange --plan arrangement.json --output arrangement-float.wav
+```
+
+The plan estimates four full songs, not an exact 20-minute edit. The arrangement
+uses individual cue points and fade lengths for each pair, records every trim,
+preserves full sources by default, and produces a float WAV for mastering.
+See [full-song strategy](docs/large-prompting-guide.md) and
+[cue-sheet format](docs/arrangement.md). Automated checks do not prove creative
+quality; missing listening review remains explicitly unreviewed.
+
+## Legacy active-cue mixing
+
+The `mix` command below retains its compatibility behavior. For complete-song
+sets, prefer `arrange` and individual musical cues instead of a uniform overlap.
+
 ## Crossfade Quality Policy
 
 The default `active-cue` mix policy runs per-track cue analysis before rendering:
@@ -407,7 +430,7 @@ agent locations.
 
 ## Status
 
-Current package version: `v0.1.1`. The project is public and the current release
+Current package version: `v0.1.2`. The project is public and the current release
 is available from [GitHub Releases](https://github.com/avalonreset/legends-stable-audio-3/releases/latest).
 
 Project-owned source, documentation, tests, and the current banner are licensed

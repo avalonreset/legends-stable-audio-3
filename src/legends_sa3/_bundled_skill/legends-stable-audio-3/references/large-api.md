@@ -13,7 +13,7 @@ Preview a request without contacting Stability or spending credits:
 legends-sa3 large plan `
   --operation text-to-audio `
   --prompt "TrackType: Music, VocalType: Instrumental, deep dub techno, 118 BPM" `
-  --duration 120 --seed 42 --steps 8 --cfg-scale 1 --output-format wav
+  --duration 380 --seed 42 --steps 8 --cfg-scale 1 --output-format wav
 ```
 
 Execute only after verifying the current price and balance. Put the key in the
@@ -24,7 +24,7 @@ $env:STABILITY_API_KEY = "<load from your secret store>"
 legends-sa3 large generate `
   --operation text-to-audio `
   --prompt "TrackType: Music, VocalType: Instrumental, deep dub techno, 118 BPM" `
-  --duration 120 --seed 42 --steps 8 --cfg-scale 1 --output-format wav `
+  --duration 380 --seed 42 --steps 8 --cfg-scale 1 --output-format wav `
   --output .\output\large-canary.wav `
   --confirmed-live-credits <live-credits-per-call> --confirm-paid
 ```
@@ -43,7 +43,7 @@ export STABILITY_API_KEY="<load from your secret store>"
 legends-sa3 large generate \
   --operation text-to-audio \
   --prompt "TrackType: Music, VocalType: Instrumental, deep dub techno, 118 BPM" \
-  --duration 120 --seed 42 --steps 8 --cfg-scale 1 --output-format wav \
+  --duration 380 --seed 42 --steps 8 --cfg-scale 1 --output-format wav \
   --output ./output/large-canary.wav \
   --confirmed-live-credits <live-credits-per-call> --confirm-paid
 ```
@@ -107,7 +107,7 @@ may already exist.
 |---|---|---:|
 | `prompt` | required, 1-10000 characters | none |
 | `model` | fixed `stable-audio-3` | `stable-audio-3` |
-| `duration` | 1-380 seconds | 190 |
+| `duration` | 1-380 seconds | upstream 190; Legends explicitly sends 380 |
 | `seed` | 0-4294967294; zero/omitted requests random | 0 |
 | `steps` | 4-8 | 8 |
 | `cfg_scale` | 1-25 | 1 |

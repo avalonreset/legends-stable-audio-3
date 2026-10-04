@@ -10,7 +10,7 @@ import zipfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "0.1.1"
+VERSION = "0.1.2"
 FORBIDDEN_RELEASE_SUFFIXES = {
     ".bin",
     ".ckpt",
@@ -95,6 +95,7 @@ ACTIVE_STALE_PATTERNS = {
 HISTORICAL_RELEASES = {
     Path("docs/releases/v0.1.0.md"),
     Path("docs/releases/v0.1.1.md"),
+    Path("docs/releases/v0.1.2.md"),
     Path("docs/releases/v0.2.0.md"),
     Path("docs/releases/v0.3.0.md"),
 }

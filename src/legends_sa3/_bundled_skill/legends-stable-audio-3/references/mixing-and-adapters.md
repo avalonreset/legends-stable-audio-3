@@ -2,10 +2,15 @@
 
 ## Long-form assembly
 
-Preserve generated source tracks. Analyze cue boundaries before assembling a
-long program. The default `active-cue` policy removes near-silent heads and
-quiet tails that waste overlap time and starts incoming tracks at usable cues.
-Use `strict` when exact raw boundaries are part of the experiment.
+Preserve generated source tracks and complete arrangements. For full-song
+sets, use `arrange` with separate cue points, overlaps and reasons for each
+pair. See [Production and arrangement](production.md). Approximate program
+length never implies trimming song bodies to a clock target.
+
+The legacy `mix` command retains its `active-cue` default for compatibility:
+it removes near-silent heads and quiet tails and uses a uniform overlap.
+Use its `strict` mode for exact raw boundaries. Neither legacy mode substitutes
+for individual musical transition decisions in a full-song production.
 
 Choose transition length by listening in musical bars and phrase boundaries.
 Twelve seconds is a proven Legends local option, not a Stability standard or a
@@ -43,4 +48,3 @@ The optional Underfit LoRA Studio bridge uses separately licensed MIT code
 pinned to a reviewed immutable commit. Verify origin, commit, required files,
 and license hash before executing downloaded scripts. Its model packs, datasets,
 and generated checkpoints remain separately licensed and outside git.
-

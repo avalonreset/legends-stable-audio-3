@@ -67,31 +67,27 @@ If unwanted content repeats at CFG 1.0, strengthen positive modality and
 arrangement language and test more seeds first. Any higher-CFG negative-prompt
 test is a controlled experiment, not an automatic quality upgrade.
 
-## Hosted Large duration tournament
+## Hosted Large full-song calibration
 
-Current first-party documentation supports 1-380 second requests, 4-8 steps,
-CFG 1-25, WAV or MP3 output, asynchronous retrieval, and a fixed 190-second
-duration when the field is omitted. Verify these mutable facts live before a
-paid run.
+Start full songs at `380s`, 8 steps, CFG 1 and WAV output. At the verified
+2026-10-04 price, each successful job costs 26 Platform credits regardless of
+length. Verify live pricing; short samples do not save credits at a flat rate.
+The upstream omitted-duration default is 190s; Legends sends 380s explicitly.
 
-Use 120-second complete-song canaries. Official evaluation evidence is strongest
-around 120-190 seconds; 380 seconds is a ceiling, and the longest generations
-can lose prompt adherence or drift toward ambient/classical material.
+Generate one full-length candidate, assess development and genre continuity,
+then expand into a small set of variations. Reuse good full-length trials.
+Keep discoveries separate from production sources. If a long song drifts,
+revise the prompt/seed and document the result before choosing shorter lengths.
+Do not prefer short D&B merely because its percussion is dense.
 
-1. Compare 3-4 prompt families with at least three 120-second seeds each.
-2. Promote one family.
-3. Test three nearby durations with the same prompt, BPM, steps, CFG, and at
-   least three requested seeds per duration.
-4. Choose the shortest range that repeatedly creates a complete arc.
-5. Shorten when extra time creates repetition, dead air, or drift.
+Musical development needs listening evidence; signal metrics are supporting
+checks. If listening is unavailable, record the candidate as unreviewed.
+The official report's poorer aggregate alignment at 380s is a testable risk,
+not a universal creative duration rule.
 
-Starting hypotheses, not vendor guarantees: dense DnB/digital hardcore
-120-160s; breakbeat/industrial 135-180s; trip-hop 150-190s; trance 165-210s;
-minimal/cinematic electronic 180-240s; ambient/drone/classical 210-320s.
-
-For a 14:09.452 program, start with five 175-190 second sources or six 145-170
-second sources. Use more/shorter sources for dense genres and fewer/longer
-sources for spacious genres.
+An approximate runtime never authorizes clock-driven body trims. Choose each
+pair's in/out cues and overlap after inspecting its actual musical sections.
+See [Production and arrangement](production.md).
 
 ## Sound effects
 

@@ -60,7 +60,7 @@ def _integer(name: str, value: object) -> int:
 class LargeRequest:
     operation: str
     prompt: str
-    duration: float = 190
+    duration: float = 380
     seed: int = 0
     steps: int = 8
     cfg_scale: float = 1.0

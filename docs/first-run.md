@@ -8,7 +8,7 @@ does not generate audio, download weights, or spend API credits.
 Use Python 3.10 or newer in a virtual environment. Install the release wheel:
 
 ```sh
-python -m pip install "https://github.com/avalonreset/legends-stable-audio-3/releases/download/v0.1.1/legends_stable_audio_3-0.1.1-py3-none-any.whl"
+python -m pip install "https://github.com/avalonreset/legends-stable-audio-3/releases/download/v0.1.2/legends_stable_audio_3-0.1.2-py3-none-any.whl"
 legends-sa3 skill validate
 legends-sa3 prompt --style "warm dub techno, tape chords, deep bass, 118 BPM" --count 1
 legends-sa3 plan --hours 10 --vram-gb 24 --crossfade 12
@@ -47,6 +47,10 @@ The installer refuses to overwrite an existing skill. See
 | hosted Large generation | [Large reference](../src/legends_sa3/_bundled_skill/legends-stable-audio-3/references/large-api.md) | provider account, current pricing, explicit paid confirmation |
 | a continuous master from existing tracks | [mix workflow](music-factory.md) | local audio files and FFmpeg/FFprobe |
 | custom native adapters | [adapter guide](lora-adapters.md) | compatible adapter checkpoint and local model runtime |
+
+For hosted full songs, read [full-song calibration](large-prompting-guide.md)
+and [individual transitions](arrangement.md). Start with
+`legends-sa3 production-plan --minutes 20`; do not use local VRAM limits for Large.
 
 Run `legends-sa3 doctor` before production. Missing FFmpeg or model tooling at
 this stage does not invalidate the model-free prompt and planning checks.

@@ -557,7 +557,8 @@ def add_large_request_args(parser: argparse.ArgumentParser) -> None:
         default="text-to-audio",
     )
     parser.add_argument("--prompt", required=True)
-    parser.add_argument("--duration", type=float, default=190)
+    parser.add_argument("--duration", type=float, default=380,
+                        help="Legends defaults to 380s for full songs; set explicitly for short cues/SFX")
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--steps", type=int, default=8)
     parser.add_argument("--cfg-scale", type=float, default=1.0)
@@ -661,10 +662,50 @@ def cmd_skill_install(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_production_plan(args: argparse.Namespace) -> int:
+    from .production import plan_production
+    try:
+        result = plan_production(
+            minutes=args.minutes, song_seconds=args.song_seconds,
+            overlap_estimate=args.overlap_estimate, runtime_intent=args.runtime_intent,
+            credits_per_job=args.credits_per_job,
+        )
+    except ValueError as error:
+        raise SystemExit(str(error)) from error
+    print(json.dumps(result, indent=2))
+    return 0
+
+
+def cmd_arrange(args: argparse.Namespace) -> int:
+    from .production import render_arrangement
+    plan_path = Path(args.plan).resolve()
+    try:
+        document = json.loads(plan_path.read_text(encoding="utf-8"))
+        receipt = render_arrangement(document, Path(args.output), base=plan_path.parent)
+    except (ValueError, KeyError, OSError, RuntimeError) as error:
+        raise SystemExit(str(error)) from error
+    print(json.dumps(receipt, indent=2))
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="legends-sa3")
     parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     sub = parser.add_subparsers(dest="command", required=True)
+
+    production = sub.add_parser("production-plan", help="Plan full songs on hosted Large")
+    production.add_argument("--minutes", type=float, required=True)
+    production.add_argument("--song-seconds", type=float, default=380)
+    production.add_argument("--overlap-estimate", type=float, default=12)
+    production.add_argument("--runtime-intent", choices=["approximate", "minimum", "exact"],
+                            default="approximate")
+    production.add_argument("--credits-per-job", type=float, default=26)
+    production.set_defaults(func=cmd_production_plan)
+
+    arrange = sub.add_parser("arrange", help="Render explicit per-pair musical cues to WAV")
+    arrange.add_argument("--plan", required=True)
+    arrange.add_argument("--output", required=True)
+    arrange.set_defaults(func=cmd_arrange)
 
     doctor = sub.add_parser("doctor")
     doctor.set_defaults(func=cmd_doctor)

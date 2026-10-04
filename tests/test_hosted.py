@@ -64,7 +64,7 @@ class HostedLargeTests(unittest.TestCase):
         plan = request.public_plan()
         self.assertEqual(plan["model"], "stable-audio-3")
         self.assertTrue(plan["endpoint"].endswith("/stable-audio/text-to-audio"))
-        self.assertEqual(plan["request"]["duration"], "190")
+        self.assertEqual(plan["request"]["duration"], "380")
         self.assertEqual(plan["reference_credits"], 26)
 
     def test_audio_operations_require_supported_input(self):

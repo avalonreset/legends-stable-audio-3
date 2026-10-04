@@ -72,6 +72,10 @@ to the repo root.
 - 16 GB VRAM: start at 240 second segments.
 - 12 GB VRAM: start at 180 second segments.
 - 8 GB VRAM: start at 120 second segments.
+- Hosted Large full songs: 380 seconds. Calibrate at full length, reuse good
+  candidates, and never shorten musical bodies to satisfy approximate runtime.
+- Use `production-plan` and `arrange` for full-song sets. Record per-pair cues,
+  overlaps, trim reasons and actual listening-review status.
 - Crossfade: 12 seconds is a local non-beat-critical bed default; use measured
   tempo, bars, and phrases when beat alignment matters.
 - Mix policy: `active-cue` by default. Use `strict` only when the user wants raw

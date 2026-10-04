@@ -2,6 +2,30 @@
 
 All notable changes to `legends-stable-audio-3` will be documented here.
 
+## 0.1.2 - 2026-10-04
+
+### Changed
+
+- Hosted Large requests now explicitly default to 380 seconds for full songs.
+  Explicit durations still support short cues and SFX; the provider's own
+  omitted-field default remains 190 seconds.
+- Replaced short dense-genre recommendations with full-length calibration,
+  reuse of good candidates, separate discovery/production roles, and honest
+  listening-review status. Approximate set length never implies body trims.
+
+### Added
+
+- `production-plan` separates individual song length from set runtime, estimates
+  flat-rate job cost, and records exact edits as a separate explicit task.
+- `arrange` renders a cue sheet with individual overlap lengths, linear or
+  equal-power curves, optional independent incoming/outgoing fade lengths,
+  source hashes, trim reasons and discovery promotion reasons.
+- Streaming float WAV output preserves overlap headroom without clipping and
+  preserves complete sources by default. Existing outputs are protected.
+- Regression tests cover full-song defaults, explicit short overrides,
+  approximate/exact planning, unpromoted discoveries, undocumented trims,
+  invalid overlaps and actual sample counts through variable transitions.
+
 ## 0.1.1 - 2026-10-04
 
 ### Fixed

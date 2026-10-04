@@ -128,20 +128,23 @@ generation. Never silently substitute one surface for another.
   a Stability.ai standard. When benchmarking, choose a transition policy after
   listening to the calibration family, then apply it identically to both model
   arms unless the comparison is explicitly about different workflows.
-- Treat Large duration as a creative conditioning control, not merely a file
-  length. The official technical report finds the strongest complete-song
-  evidence at intermediate `120-190s` lengths and reduced prompt adherence at
-  `380s`, with the longest examples biased toward ambient/classical material.
-- For Large discovery, prefer `120s` canaries. Verify current Platform pricing
-  before spending; very short full-song requests are not the documented quality
-  sweet spot.
-- Choose a genre-sensitive production range instead of one universal duration.
-  For a `14:09.452` program, begin with five sources around `175-190s` or six
-  around `145-170s`; use shorter/more sources for dense genres and longer/fewer
-  sources for spacious genres. See
-  [Prompt mastery](references/prompt-mastery.md).
-- Omitting the Large API `duration` chooses the fixed `190s` default. Do not
-  describe omission as an adaptive `AUTO` mode.
+- For hosted Large full songs and continuous sets, request `380s` explicitly.
+  This maximizes available music per flat-rate paid job. Shorten for an explicit
+  short-cue/SFX brief or a documented quality problem, not because a genre is
+  dense or fast. Local GPU recommendations do not constrain hosted Large.
+- Calibrate with one full-length candidate before expanding. Reuse accepted
+  full-length candidates; never silently promote short discoveries.
+- The technical report warns of possible genre drift at 380s. Check the actual
+  result; it does not establish a preferred two-minute D&B duration.
+- Separate song length from approximate set length. Do not trim musical bodies
+  to a round runtime unless an exact edit was explicitly requested.
+- Use `production-plan` and `arrange` for full-song production with per-pair
+  cues, reasons, overlaps, source hashes and review status. See
+  [Production and arrangement](references/production.md).
+- Automated tempo, silence and level checks cannot prove musical development.
+  If listening review is absent, label it unreviewed rather than passed.
+- The upstream API default remains `190s` when omitted; Legends now explicitly
+  sends `380s`. Neither omission nor the Legends default is adaptive AUTO.
 
 For paid or benchmark work, read
 [Surfaces and receipts](references/surfaces-and-receipts.md). Freeze the prompt,
@@ -150,7 +153,11 @@ steps, CFG, source format, and downstream treatment before a Medium/Large A/B.
 Disclose that equal seed numbers do not imply equivalent latent noise and that
 the hosted checkpoint revision is not necessarily exposed.
 
-## Workflow
+## Local Medium workflow
+
+For hosted Large, use the full-song calibration and `production-plan` /
+`arrange` workflow in [Production and arrangement](references/production.md).
+The GPU setup and short local hardware trials below apply to Medium.
 
 0. Bootstrap a source checkout with an isolated environment. On Windows use
    `python -m venv .venv`, then `.\.venv\Scripts\python.exe -m pip install -e
@@ -166,7 +173,7 @@ the hosted checkpoint revision is not necessarily exposed.
    guidance at non-default CFG as an experiment, not a quality upgrade.
 4. Plan duration when needed. For example:
    `legends-sa3 plan --minutes 60 --vram-gb 16 --crossfade 12`.
-5. Preview prompts when needed. For important music, compare 3-4 prompt families
+5. Preview prompts when needed. For local Medium music, compare 3-4 prompt families
    with at least 4 short seeds each before a long render. `prompt --count` shows
    expansion only; the actual local canary is a short one-track generation such
    as `legends-sa3 generate --model-dir ./models/stable-audio-3-medium

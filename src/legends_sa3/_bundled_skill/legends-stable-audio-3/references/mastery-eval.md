@@ -16,8 +16,8 @@ operating rules, states evidence limits, and avoids unsafe side effects.
    straight/half/double-time behavior and drift.
 7. **Medium selection:** compares at least 3-4 prompt families and four short
    seeds per family before long generation.
-8. **Large duration:** starts with 120-second canaries, runs a controlled
-   multi-seed duration tournament, and treats 380 seconds as a ceiling.
+8. **Large duration:** starts full songs at 380 seconds, separates approximate set length
+   from song length, and requires a reason to shorten or promote discoveries.
 9. **Sound effect:** uses `TrackType: SFX`, names one event/attack/decay, omits
    rhythmic bed and automatic BPM, compares seeds, then trims after selection.
 10. **Spoken-word bed:** specifies sparse midrange and restrained lead activity

@@ -9,7 +9,10 @@ from pathlib import Path
 
 
 def run(command: list[str], *, env: dict[str, str] | None = None) -> None:
-    result = subprocess.run(command, check=True, text=True, capture_output=True, env=env)
+    clean_env = dict(os.environ if env is None else env)
+    clean_env.pop("PYTHONPATH", None)
+    clean_env.pop("PYTHONHOME", None)
+    result = subprocess.run(command, check=True, text=True, capture_output=True, env=clean_env)
     if result.stdout.strip():
         print(result.stdout.strip())
 
@@ -22,7 +25,7 @@ def verify_artifact(artifact: Path, label: str) -> None:
         python = environment / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
         cli = environment / ("Scripts/legends-sa3.exe" if os.name == "nt" else "bin/legends-sa3")
         run([str(python), "-m", "pip", "install", "--disable-pip-version-check", str(artifact)])
-        run([str(python), "-c", "import legends_sa3; assert legends_sa3.__version__ == '0.1.1'"])
+        run([str(python), "-c", "import legends_sa3; assert legends_sa3.__version__ == '0.1.2'"])
         run([str(cli), "--version"])
         run([str(cli), "skill", "validate"])
         install_target = root / "skills"
@@ -37,6 +40,7 @@ def verify_artifact(artifact: Path, label: str) -> None:
             "mastery-eval.md",
             "mixing-and-adapters.md",
             "prompt-mastery.md",
+            "production.md",
             "surfaces-and-receipts.md",
         }
         actual_references = {path.name for path in references.glob("*.md")}
@@ -70,6 +74,8 @@ def verify_artifact(artifact: Path, label: str) -> None:
             ]
         )
         run([str(cli), "large", "result", "--help"])
+        run([str(cli), "production-plan", "--minutes", "20"])
+        run([str(cli), "arrange", "--help"])
         print(f"clean {label} install: ok")
 
 
@@ -77,10 +83,10 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Install and smoke-test built wheel and source artifacts.")
     parser.add_argument("--dist", type=Path, default=Path("dist"))
     args = parser.parse_args()
-    wheels = sorted(args.dist.glob("legends_stable_audio_3-0.1.1-*.whl"))
-    sdists = sorted(args.dist.glob("legends_stable_audio_3-0.1.1.tar.gz"))
+    wheels = sorted(args.dist.glob("legends_stable_audio_3-0.1.2-*.whl"))
+    sdists = sorted(args.dist.glob("legends_stable_audio_3-0.1.2.tar.gz"))
     if len(wheels) != 1 or len(sdists) != 1:
-        raise SystemExit("Expected exactly one v0.1.1 wheel and one v0.1.1 sdist")
+        raise SystemExit("Expected exactly one v0.1.2 wheel and one v0.1.2 sdist")
     verify_artifact(wheels[0].resolve(), "wheel")
     verify_artifact(sdists[0].resolve(), "sdist")
     return 0
