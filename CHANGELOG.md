@@ -14,6 +14,8 @@ All notable changes to `legends-stable-audio-3` will be documented here.
   receipts, and no-retry policy for paid submissions remain intact.
 - Added a regression test for both output formats that rejects the former
   header and proves retrieval uses only GET.
+- Refreshed the development dependency lock to urllib3 2.8.0 after the release
+  audit identified three advisories affecting the previously locked 2.7.0.
 
 ## 0.1.0 - 2026-09-25
 
