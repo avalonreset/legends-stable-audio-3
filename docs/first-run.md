@@ -8,7 +8,7 @@ does not generate audio, download weights, or spend API credits.
 Use Python 3.10 or newer in a virtual environment. Install the release wheel:
 
 ```sh
-python -m pip install "https://github.com/avalonreset/legends-stable-audio-3/releases/download/v0.1.0/legends_stable_audio_3-0.1.0-py3-none-any.whl"
+python -m pip install "https://github.com/avalonreset/legends-stable-audio-3/releases/download/v0.1.1/legends_stable_audio_3-0.1.1-py3-none-any.whl"
 legends-sa3 skill validate
 legends-sa3 prompt --style "warm dub techno, tape chords, deep bass, 118 BPM" --count 1
 legends-sa3 plan --hours 10 --vram-gb 24 --crossfade 12

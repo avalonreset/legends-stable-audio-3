@@ -37,6 +37,28 @@ class FakeResponse:
 
 
 class HostedLargeTests(unittest.TestCase):
+    def test_result_negotiates_audio_wildcard_for_wav_and_mp3(self):
+        for output_format, payload, content_type in [
+            ("wav", b"RIFF\x04\x00\x00\x00WAVEdata", "audio/wav"),
+            ("mp3", b"ID3\x04\x00\x00\x00\x00\x00\x00data", "audio/mpeg"),
+        ]:
+            requests = []
+
+            def endpoint(request, timeout):
+                requests.append(request)
+                if request.get_header("Accept") != "audio/*":
+                    raise urllib.error.HTTPError(
+                        request.full_url, 400, "unsupported accept", {}, None
+                    )
+                return FakeResponse(200, payload, {"Content-Type": content_type})
+
+            with self.subTest(output_format=output_format), tempfile.TemporaryDirectory() as temp:
+                with patch("legends_sa3.hosted._open_url", side_effect=endpoint):
+                    output = Path(temp) / f"result.{output_format}"
+                    poll_large_result("existing-job", "secret", output, output_format=output_format)
+                self.assertEqual(output.read_bytes(), payload)
+                self.assertEqual([request.get_method() for request in requests], ["GET"])
+
     def test_text_plan_matches_live_schema(self):
         request = LargeRequest(operation="text-to-audio", prompt="Dark dub, 118 BPM")
         plan = request.public_plan()

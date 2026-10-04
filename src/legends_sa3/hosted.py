@@ -282,7 +282,9 @@ def poll_large_result(
     if output.exists() and not overwrite:
         raise FileExistsError(f"Refusing to overwrite existing output without --overwrite: {output}")
     deadline = time.monotonic() + timeout
-    accept = "audio/mpeg" if output_format == "mp3" else "audio/wav"
+    # The result endpoint accepts audio/*, not format-specific audio MIME types.
+    # The submitted output_format determines encoding; validate returned bytes below.
+    accept = "audio/*"
     endpoint = f"{API_BASE}/results/{generation_id}"
     consecutive_retries = 0
     while True:

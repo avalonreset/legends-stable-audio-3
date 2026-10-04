@@ -2,6 +2,19 @@
 
 All notable changes to `legends-stable-audio-3` will be documented here.
 
+## 0.1.1 - 2026-10-04
+
+### Fixed
+
+- Hosted Large result retrieval now sends the service-required `Accept:
+  audio/*` header for both WAV and MP3. Format-specific Accept values caused
+  HTTP 400 after an otherwise successful paid submission.
+- Updated the portable Large reference with the correct header and existing-job
+  recovery instructions. The requested format, response validation, pending
+  receipts, and no-retry policy for paid submissions remain intact.
+- Added a regression test for both output formats that rejects the former
+  header and proves retrieval uses only GET.
+
 ## 0.1.0 - 2026-09-25
 
 Router-native reset: the repo now vendors a pinned copy of the single

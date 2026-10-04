@@ -89,8 +89,10 @@ $STABILITY_API_KEY`, and return HTTP `202` with `{ "id": "..." }`. Poll:
 ```text
 GET https://api.stability.ai/v2beta/audio/results/{id}
 Authorization: Bearer $STABILITY_API_KEY
-Accept: audio/wav | audio/mpeg
+Accept: audio/*
 ```
+
+The result endpoint requires `Accept: audio/*`; format-specific values such as `audio/wav` are rejected with HTTP 400. The submitted `output_format` selects WAV or MP3, and the client validates the returned media type and file signature. Recovery downloads the existing job and does not spend another generation credit charge.
 
 HTTP `202` means the generation remains in progress. HTTP `200` returns the
 audio bytes; preserve `seed`, `finish-reason`, and `x-request-id` response
