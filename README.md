@@ -25,7 +25,7 @@ Install with `cto-legends install legends-stable-audio-3`, then follow the modul
 
 <p align="left">
   <a href="https://www.youtube.com/watch?v=ZMF28c_M7OU">
-    <img src="assets/stable-audio-3-youtube.png" alt="stable-audio-3 music production walkthrough — watch on YouTube" width="560" height="560">
+    <img src="assets/stable-audio-3-youtube.png" alt="stable-audio-3 music production walkthrough - watch on YouTube" width="560" height="560">
   </a>
 </p>
 <p align="left">
@@ -65,7 +65,7 @@ method:
 6. Analyze active cues and assemble long masters without dead-air crossfades or
    one enormous FFmpeg graph.
 
-That operating intelligence ships inside the skill. It is the product—not a
+That operating intelligence ships inside the skill. It is the product-not a
 link back to a private development vault.
 
 ## Choose your surface
@@ -427,6 +427,14 @@ agent locations.
 - [Dependency and reproducibility policy](docs/dependency-policy.md)
 - [Troubleshooting](docs/troubleshooting.md)
 - [Release checklist](docs/release-checklist.md)
+
+## FAQ
+
+**Does `legends-stable-audio-3` bundle Stability AI model weights?**
+No. You must accept Stability AI's terms on Hugging Face and download `stable-audio-3-medium` yourself, or use your own `STABILITY_API_KEY` for hosted Stable Audio 3 Large REST requests.
+
+**Does `legends-sa3 large plan` spend Stability AI platform credits?**
+No. `legends-sa3 large plan` previews the request offline. Paid hosted execution requires both `--confirmed-live-credits <n>` and `--confirm-paid`.
 
 ## Status
 
