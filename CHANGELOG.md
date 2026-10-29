@@ -2,6 +2,14 @@
 
 All notable changes to `legends-stable-audio-3` will be documented here.
 
+## 0.1.3 - 2026-10-29
+
+### Changed
+
+- Raise minimum supported Python runtime to Python 3.11 (`requires-python = ">=3.11"`) across package metadata, documentation, and multi-OS CI.
+- Upgrade release lockfile (`uv.lock`) with `uv 0.13.6`, bumping `pip` to `26.2.2` (fixing `CVE-2026-1703`) and `certifi` to `2026.10.23`.
+- Harden `.github/workflows/contract.yml` with 40-character commit SHA action pins and explicit `contents: read` permissions.
+
 ## 0.1.2 - 2026-10-04
 
 ### Changed

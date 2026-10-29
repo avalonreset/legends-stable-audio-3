@@ -23,7 +23,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        python: ["3.10", "3.12", "3.14"]
+        python: ["3.11", "3.12", "3.14"]
     steps:
       - name: Check out source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -35,7 +35,9 @@ jobs:
           python-version: ${{ matrix.python }}
           cache: pip
       - name: Install core package
-        run: python -m pip install --disable-pip-version-check -e .
+        run: |
+          python -m pip install --disable-pip-version-check --upgrade "pip>=26.2.2"
+          python -m pip install --disable-pip-version-check -e .
       - name: Run unit and Git-less export tests
         env:
           PYTHONDONTWRITEBYTECODE: "1"
@@ -60,7 +62,7 @@ jobs:
           python-version: "3.12"
           cache: pip
       - name: Install pinned resolver
-        run: python -m pip install --disable-pip-version-check uv==0.11.26
+        run: python -m pip install --disable-pip-version-check uv==0.13.6
       - name: Verify frozen dependency resolution
         run: uv lock --check && uv sync --frozen --group release
       - name: Lint Python source and release tooling

@@ -15,7 +15,7 @@ body:
     attributes:
       label: Environment
       description: OS, GPU, VRAM, Python version, Torch/CUDA version, ffmpeg version.
-      placeholder: Windows 11, RTX 4090 24 GB, Python 3.10, torch 2.7.1+cu128
+      placeholder: Windows 11, RTX 4090 24 GB, Python 3.11, torch 2.7.1+cu128
     validations:
       required: true
   - type: textarea

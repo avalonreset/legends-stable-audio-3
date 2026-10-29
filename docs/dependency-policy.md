@@ -1,7 +1,7 @@
 # Dependency and reproducibility policy
 
-Legends Stable Audio 3 supports Python 3.10 and 3.12 on Windows and Ubuntu in
-CI. Python 3.11 remains supported by the declared `>=3.10` package metadata and
+Legends Stable Audio 3 supports Python 3.11 and 3.12 on Windows and Ubuntu in
+CI. Python 3.11 remains supported by the declared `>=3.11` package metadata and
 is exercised during local release preparation.
 
 ## Reproducible source/tool environment
