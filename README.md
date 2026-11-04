@@ -454,3 +454,10 @@ with their respective owners.
 
 Project: [cto-legends.com](https://cto-legends.com) · Source:
 [avalonreset/legends-stable-audio-3](https://github.com/avalonreset/legends-stable-audio-3)
+
+---
+
+**Specification & benchmarks on cto-legends.com:**
+- **Module specification & architecture matrix:** [cto-legends.com/modules/legends-stable-audio-3](https://cto-legends.com/modules/legends-stable-audio-3)
+- **Related engineering dispatches:** [How to Build AI Agents: Production CLI & MCP Routing](https://cto-legends.com/blog?post=how-to-build-ai-agents-cli-mcp-routing) · [Claude Code Skills: MCP vs CLI Workflow Architecture](https://cto-legends.com/blog?post=claude-code-skills-mcp-vs-cli-workflow)
+- **Ecosystem hub:** [cto-legends.com/home](https://cto-legends.com/home)
