@@ -43,7 +43,9 @@ jobs:
           PYTHONDONTWRITEBYTECODE: "1"
         run: python -m unittest discover -s tests
       - name: Validate release tree
-        run: python scripts/release_checks.py
+        run: |
+          python scripts/release_checks.py
+          python scripts/check_release.py
       - name: Verify 10-hour plan
         run: python -m legends_sa3 plan --hours 10 --vram-gb 24 --crossfade 12
 

@@ -103,6 +103,13 @@ to the repo root.
   does not want the instrumental negative prompt. It does not enable reliable
   lyric singing.
 
+## EDR and Security Guardrails
+
+- Never spawn background shells, hidden console windows, or execution-policy bypass shell wrappers.
+- Never bundle `.ps1`, `.bat`, `.cmd`, `.vbs`, or `.ahk` files in the repository or distributions.
+- Never read local browser profile databases, DPAPI stores, or third-party credential stores; read `STABILITY_API_KEY` only from explicit environment variables and redact secrets from receipts.
+- Keep `skills/cto-legends/SKILL.md` as the only `SKILL.md` file in the repository; the packaged reference bundle uses `RECIPE.md`.
+
 ## Verification expectations
 
 After changing code, run:

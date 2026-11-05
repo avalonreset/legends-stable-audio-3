@@ -49,6 +49,12 @@ class SkillDistributionTests(unittest.TestCase):
             self.assertFalse(mirror.is_dir() and any(mirror.iterdir()))
         vendored = ROOT / "skills" / "cto-legends" / "SKILL.md"
         self.assertTrue(vendored.is_file())
+        all_skills = [
+            p.relative_to(ROOT).as_posix()
+            for p in ROOT.rglob("SKILL.md")
+            if not any(part in {".git", ".venv", "build", "dist"} for part in p.parts)
+        ]
+        self.assertEqual(all_skills, ["skills/cto-legends/SKILL.md"])
 
 
 if __name__ == "__main__":

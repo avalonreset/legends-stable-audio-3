@@ -8,7 +8,7 @@ no `skills/legends-stable-audio-3` sources, no `.agents/skills` or
 
 The installable Python package still ships its operating bundle
 (`legends-sa3 skill validate` / `legends-sa3 skill install --target
-<skills-directory>`), which carries the `SKILL.md` entrypoint, optional
+<skills-directory>`), which carries the `RECIPE.md` entrypoint, optional
 `agents/openai.yaml` UI metadata, and the `references/` library.
 
 Do not claim automatic discovery for a client until its live version and

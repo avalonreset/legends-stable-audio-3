@@ -132,8 +132,34 @@ def resolved_recipe(args: argparse.Namespace) -> str | None:
     return "lofi-study"
 
 
-def cmd_doctor(_: argparse.Namespace) -> int:
+def cmd_doctor(args: argparse.Namespace) -> int:
     report = run_doctor()
+    if getattr(args, "json", False):
+        print(
+            json.dumps(
+                {
+                    "ok": True,
+                    "module": "legends-stable-audio-3",
+                    "version": __version__,
+                    "offline": bool(getattr(args, "offline", False)),
+                    "platform": report.platform,
+                    "architecture": report.architecture,
+                    "python": report.python,
+                    "ffmpeg": report.ffmpeg,
+                    "ffprobe": report.ffprobe,
+                    "torch": report.torch,
+                    "cuda": report.cuda,
+                    "mps": report.mps,
+                    "stable_audio_runtime": report.stable_audio_runtime,
+                    "flash_attn": report.flash_attn,
+                    "gpu": report.gpu_name,
+                    "vram_gb": report.vram_gb,
+                    "local_medium_backend": report.local_medium_backend,
+                },
+                indent=2,
+            )
+        )
+        return 0
     print(f"platform: {report.platform}")
     print(f"architecture: {report.architecture}")
     print(f"python: {report.python}")
@@ -708,6 +734,9 @@ def build_parser() -> argparse.ArgumentParser:
     arrange.set_defaults(func=cmd_arrange)
 
     doctor = sub.add_parser("doctor")
+    doctor.add_argument("--offline", action="store_true", help="Run offline readiness check")
+    doctor.add_argument("--json", action="store_true", help="Print machine-readable JSON")
+    doctor.add_argument("--text", action="store_true", help="Print human-readable key/value lines")
     doctor.set_defaults(func=cmd_doctor)
 
     download = sub.add_parser("download-model")

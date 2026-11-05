@@ -25,12 +25,12 @@ def verify_artifact(artifact: Path, label: str) -> None:
         python = environment / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
         cli = environment / ("Scripts/legends-sa3.exe" if os.name == "nt" else "bin/legends-sa3")
         run([str(python), "-m", "pip", "install", "--disable-pip-version-check", str(artifact)])
-        run([str(python), "-c", "import legends_sa3; assert legends_sa3.__version__ == '0.1.3'"])
+        run([str(python), "-c", "import legends_sa3; assert legends_sa3.__version__ == '0.1.4'"])
         run([str(cli), "--version"])
         run([str(cli), "skill", "validate"])
         install_target = root / "skills"
         run([str(cli), "skill", "install", "--target", str(install_target)])
-        installed = install_target / "legends-stable-audio-3" / "SKILL.md"
+        installed = install_target / "legends-stable-audio-3" / "RECIPE.md"
         if not installed.is_file():
             raise RuntimeError(f"{label} install did not create {installed}")
         references = installed.parent / "references"
@@ -83,10 +83,10 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Install and smoke-test built wheel and source artifacts.")
     parser.add_argument("--dist", type=Path, default=Path("dist"))
     args = parser.parse_args()
-    wheels = sorted(args.dist.glob("legends_stable_audio_3-0.1.3-*.whl"))
-    sdists = sorted(args.dist.glob("legends_stable_audio_3-0.1.3.tar.gz"))
+    wheels = sorted(args.dist.glob("legends_stable_audio_3-0.1.4-*.whl"))
+    sdists = sorted(args.dist.glob("legends_stable_audio_3-0.1.4.tar.gz"))
     if len(wheels) != 1 or len(sdists) != 1:
-        raise SystemExit("Expected exactly one v0.1.3 wheel and one v0.1.3 sdist")
+        raise SystemExit("Expected exactly one v0.1.4 wheel and one v0.1.4 sdist")
     verify_artifact(wheels[0].resolve(), "wheel")
     verify_artifact(sdists[0].resolve(), "sdist")
     return 0

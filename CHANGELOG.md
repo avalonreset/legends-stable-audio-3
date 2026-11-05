@@ -2,6 +2,18 @@
 
 All notable changes to `legends-stable-audio-3` will be documented here.
 
+## 0.1.4 - 2026-11-05
+
+### Added
+
+- Added `docs/AGENT-RECIPE.md` with complete CLI reference and Windows Defender / EDR security guardrails, and added security guardrails to `AGENTS.md`.
+- Added `--offline`, `--json`, and `--text` flags to `legends-sa3 doctor`.
+- Added `assets/preview.png`, `assets/manifest.json`, and `scripts/check_release.py`.
+
+### Changed
+
+- Renamed the bundled package recipe entrypoint from `SKILL.md` to `RECIPE.md` under `src/legends_sa3/_bundled_skill/legends-stable-audio-3/` so `skills/cto-legends/SKILL.md` is the sole `SKILL.md` file in the repository.
+
 ## 0.1.3 - 2026-10-29
 
 ### Changed

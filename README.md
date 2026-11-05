@@ -100,7 +100,7 @@ To install the packaged operating bundle into a configured directory-based
 Agent Skills target, install the release wheel and choose the target explicitly:
 
 ```bash
-python -m pip install "https://github.com/avalonreset/legends-stable-audio-3/releases/download/v0.1.3/legends_stable_audio_3-0.1.3-py3-none-any.whl"
+python -m pip install "https://github.com/avalonreset/legends-stable-audio-3/releases/download/v0.1.4/legends_stable_audio_3-0.1.4-py3-none-any.whl"
 legends-sa3 skill validate
 legends-sa3 skill install --target <skills-directory>
 ```
@@ -412,6 +412,7 @@ agent locations.
 
 ## Documentation
 
+- [Agent recipe](docs/AGENT-RECIPE.md)
 - [Model access](docs/model-access.md)
 - [Prompting guide](docs/prompting-guide.md)
 - [LoRA adapters](docs/lora-adapters.md)
@@ -438,7 +439,7 @@ No. `legends-sa3 large plan` previews the request offline. Paid hosted execution
 
 ## Status
 
-Current package version: `v0.1.3`. The project is public and the current release
+Current package version: `v0.1.4`. The project is public and the current release
 is available from [GitHub Releases](https://github.com/avalonreset/legends-stable-audio-3/releases/latest).
 
 Project-owned source, documentation, tests, and the current banner are licensed

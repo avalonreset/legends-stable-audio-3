@@ -17,7 +17,7 @@ def bundled_skill_path() -> Path:
 def validate_skill(path: Path | None = None) -> list[str]:
     root = (path or bundled_skill_path()).resolve()
     errors: list[str] = []
-    skill_path = root / "SKILL.md"
+    skill_path = root / "RECIPE.md"
     metadata_path = root / "agents" / "openai.yaml"
 
     if not skill_path.is_file():
@@ -25,12 +25,12 @@ def validate_skill(path: Path | None = None) -> list[str]:
     else:
         lines = skill_path.read_text(encoding="utf-8").splitlines()
         if not lines or lines[0] != "---":
-            errors.append("SKILL.md is missing its opening YAML delimiter")
+            errors.append("RECIPE.md is missing its opening YAML delimiter")
         else:
             try:
                 closing = lines.index("---", 1)
             except ValueError:
-                errors.append("SKILL.md is missing its closing YAML delimiter")
+                errors.append("RECIPE.md is missing its closing YAML delimiter")
             else:
                 fields: dict[str, str] = {}
                 for line in lines[1:closing]:
@@ -38,11 +38,11 @@ def validate_skill(path: Path | None = None) -> list[str]:
                         key, value = line.split(":", 1)
                         fields[key.strip()] = value.strip()
                 if set(fields) != {"name", "description"}:
-                    errors.append("SKILL.md frontmatter must contain only name and description")
+                    errors.append("RECIPE.md frontmatter must contain only name and description")
                 if fields.get("name") != SKILL_NAME:
-                    errors.append(f"SKILL.md name must be {SKILL_NAME}")
+                    errors.append(f"RECIPE.md name must be {SKILL_NAME}")
                 if not fields.get("description"):
-                    errors.append("SKILL.md description must not be empty")
+                    errors.append("RECIPE.md description must not be empty")
 
     if not metadata_path.is_file():
         errors.append(f"missing Codex UI metadata: {metadata_path}")

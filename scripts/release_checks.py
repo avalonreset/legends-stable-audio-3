@@ -10,7 +10,7 @@ import zipfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "0.1.3"
+VERSION = "0.1.4"
 FORBIDDEN_RELEASE_SUFFIXES = {
     ".bin",
     ".ckpt",
@@ -73,7 +73,10 @@ REQUIRED_FILES = (
     "CITATION.cff",
     "SUPPORT.md",
     "assets/PROVENANCE.md",
+    "docs/AGENT-RECIPE.md",
     "docs/platform-support.md",
+    "assets/preview.png",
+    "assets/manifest.json",
     "scripts/export_public_source.py",
     "src/legends_sa3/hosted.py",
     "skills/cto-legends/SKILL.md",
@@ -224,7 +227,7 @@ def validate_archive(path: Path) -> list[str]:
     if path.suffix == ".whl":
         required_suffixes.extend(
             [
-                "legends_sa3/_bundled_skill/legends-stable-audio-3/skill.md",
+                "legends_sa3/_bundled_skill/legends-stable-audio-3/recipe.md",
                 "legends_sa3/_bundled_skill/legends-stable-audio-3/agents/openai.yaml",
                 "legends_sa3/_bundled_skill/legends-stable-audio-3/references/licensing-and-dependencies.md",
                 "legends_sa3/_bundled_skill/legends-stable-audio-3/references/large-api.md",
@@ -240,7 +243,7 @@ def validate_archive(path: Path) -> list[str]:
                 "/agents.md",
                 "/skills/cto-legends/skill.md",
                 "/.legends-module",
-                "/src/legends_sa3/_bundled_skill/legends-stable-audio-3/skill.md",
+                "/src/legends_sa3/_bundled_skill/legends-stable-audio-3/recipe.md",
                 "/src/legends_sa3/_bundled_skill/legends-stable-audio-3/agents/openai.yaml",
                 "/src/legends_sa3/_bundled_skill/legends-stable-audio-3/references/licensing-and-dependencies.md",
                 "/src/legends_sa3/_bundled_skill/legends-stable-audio-3/references/large-api.md",
