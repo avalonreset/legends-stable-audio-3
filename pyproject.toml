@@ -34,8 +34,8 @@ Documentation = "https://github.com/avalonreset/legends-stable-audio-3#documenta
 Releases = "https://github.com/avalonreset/legends-stable-audio-3/releases"
 
 [project.optional-dependencies]
-download = ["huggingface_hub>=0.23,<2"]
-generate = ["torch>=2.4,<3", "torchaudio>=2.4,<3", "huggingface_hub>=0.23,<2"]
+download = ["huggingface_hub>=0.23,<3"]
+generate = ["torch>=2.4,<3", "torchaudio>=2.4,<3", "huggingface_hub>=0.23,<3"]
 dev = ["pytest>=8,<10"]
 
 [dependency-groups]
