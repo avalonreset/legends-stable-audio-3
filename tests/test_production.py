@@ -137,6 +137,26 @@ class ProductionTests(unittest.TestCase):
             self.assertEqual(receipt["rendered_samples"], 15*rate)
             self.assertEqual(len(receipt["transitions"]), 2)
 
+    def test_arrangement_rejects_external_path_traversal_and_allows_explicit_override(self):
+        with tempfile.TemporaryDirectory() as outer_tmp:
+            outer = Path(outer_tmp)
+            outside_file = outer / "outside.wav"
+            outside_file.write_bytes(b"RIFFfake")
+            base = outer / "sub"
+            base.mkdir()
+            doc = {
+                "tracks": [
+                    {
+                        "source": "../outside.wav",
+                        "selection_reason": "test",
+                        "stage": "production",
+                    }
+                ],
+                "transitions": [],
+            }
+            with self.assertRaisesRegex(ValueError, "escapes arrangement base directory"):
+                render_arrangement(doc, base / "out.wav", base=base)
+
 
 if __name__ == "__main__":
     unittest.main()

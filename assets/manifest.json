@@ -1,30 +1,88 @@
 {
   "module": "legends-stable-audio-3",
-  "version": "0.1.4",
+  "version": "0.1.5",
+  "files": [
+    {
+      "name": "banner.png",
+      "width": 4096,
+      "height": 1024,
+      "format": "PNG",
+      "bytes": 67501,
+      "sha256": "c53b2f67843e900aa7bbcc25ee88640824d2c16b89446ab0059c3f3619589f9b"
+    },
+    {
+      "name": "banner.webp",
+      "width": 4096,
+      "height": 1024,
+      "format": "WEBP",
+      "bytes": 69532,
+      "sha256": "ee068188a54b03d479ade17c7edf8027cba53d0c697391716d2dec0465b0bc98"
+    },
+    {
+      "name": "preview.png",
+      "width": 1024,
+      "height": 256,
+      "format": "PNG",
+      "bytes": 25350,
+      "sha256": "f7de76f02b7f9d5cdac0d77e587e4e8c225cfce1672727b71b1c236c835076bb"
+    },
+    {
+      "name": "social-preview.png",
+      "width": 1280,
+      "height": 640,
+      "format": "PNG",
+      "bytes": 22634,
+      "sha256": "ef3f5acc5a6ac852910d59da781561d1f5f13896ee4bc2d6e961ccd46a48c14f"
+    },
+    {
+      "name": "stable-audio-3-youtube.png",
+      "width": 560,
+      "height": 560,
+      "format": "PNG",
+      "bytes": 1896582,
+      "sha256": "8f0d266602c58741974d9ea13a260e61698b9815d3b9e36a578bcc7caffbac75"
+    }
+  ],
   "assets": {
     "banner_png": {
       "path": "assets/banner.png",
       "width": 4096,
       "height": 1024,
-      "format": "PNG"
+      "format": "PNG",
+      "bytes": 67501,
+      "sha256": "c53b2f67843e900aa7bbcc25ee88640824d2c16b89446ab0059c3f3619589f9b"
     },
     "banner_webp": {
       "path": "assets/banner.webp",
       "width": 4096,
       "height": 1024,
-      "format": "WEBP"
+      "format": "WEBP",
+      "bytes": 69532,
+      "sha256": "ee068188a54b03d479ade17c7edf8027cba53d0c697391716d2dec0465b0bc98"
     },
     "preview_png": {
       "path": "assets/preview.png",
       "width": 1024,
       "height": 256,
-      "format": "PNG"
+      "format": "PNG",
+      "bytes": 25350,
+      "sha256": "f7de76f02b7f9d5cdac0d77e587e4e8c225cfce1672727b71b1c236c835076bb"
     },
     "social_preview_png": {
       "path": "assets/social-preview.png",
       "width": 1280,
       "height": 640,
-      "format": "PNG"
+      "format": "PNG",
+      "bytes": 22634,
+      "sha256": "ef3f5acc5a6ac852910d59da781561d1f5f13896ee4bc2d6e961ccd46a48c14f"
+    },
+    "youtube_preview_png": {
+      "path": "assets/stable-audio-3-youtube.png",
+      "width": 560,
+      "height": 560,
+      "format": "PNG",
+      "bytes": 1896582,
+      "sha256": "8f0d266602c58741974d9ea13a260e61698b9815d3b9e36a578bcc7caffbac75"
     }
   }
 }

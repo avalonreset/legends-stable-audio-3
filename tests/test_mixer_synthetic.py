@@ -118,6 +118,23 @@ class MixerSyntheticTests(unittest.TestCase):
             self.assertFalse(output.exists())
             self.assertFalse((root / "mix.tmp.mp3").exists())
 
+    def test_collect_safe_tracks_rejects_traversal_patterns_and_overwrites(self):
+        from legends_sa3.cli import _collect_safe_tracks
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            for bad_pattern in ("../*.mp3", "sub/*.mp3", "C:*.mp3", r"sub\*.mp3"):
+                with self.assertRaisesRegex(ValueError, "Unsafe glob pattern"):
+                    _collect_safe_tracks(root, bad_pattern)
+            output = root / "existing.mp3"
+            output.write_bytes(b"existing")
+            track = root / "001.wav"
+            write_tone(track, 220, 1.0)
+            with self.assertRaisesRegex(FileExistsError, "--overwrite"):
+                mix_tracks([track], output, crossfade_seconds=0.0, overwrite=False)
+            with self.assertRaisesRegex(ValueError, "Invalid audio bitrate"):
+                mix_tracks([track], root / "new.mp3", bitrate="320k;evil")
+
 
 if __name__ == "__main__":
     unittest.main()

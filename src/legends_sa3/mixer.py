@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import math
+import re
 import subprocess
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -11,6 +12,8 @@ import numpy as np
 MIN_DBFS = -120.0
 MIX_POLICIES = ("active-cue", "strict")
 QUALITY_GATES = ("warn", "fail", "off")
+BITRATE_RE = re.compile(r"^[1-9]\d{1,3}[kK]?$")
+MAX_PCM_BYTES = 512 * 1024 * 1024
 
 
 @dataclass
@@ -32,14 +35,24 @@ class TrackAnalysis:
     warnings: list[str]
 
 
-def decode_audio(path: Path, sample_rate: int, channels: int) -> np.ndarray:
+def decode_audio(
+    path: Path,
+    sample_rate: int,
+    channels: int,
+    *,
+    timeout: float = 300.0,
+    max_pcm_bytes: int = MAX_PCM_BYTES,
+) -> np.ndarray:
+    if path.is_symlink():
+        raise ValueError(f"Refusing symlinked audio file: {path}")
+    resolved = path.resolve()
     args = [
         "ffmpeg",
         "-hide_banner",
         "-loglevel",
         "error",
         "-i",
-        str(path),
+        str(resolved),
         "-f",
         "f32le",
         "-acodec",
@@ -50,15 +63,23 @@ def decode_audio(path: Path, sample_rate: int, channels: int) -> np.ndarray:
         str(sample_rate),
         "-",
     ]
-    proc = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    proc = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=timeout)
     if proc.returncode != 0:
         raise RuntimeError(f"ffmpeg decode failed for {path}:\n{proc.stderr.decode(errors='replace')}")
+    if len(proc.stdout) > max_pcm_bytes:
+        raise ValueError(
+            f"Decoded PCM buffer for {path.name} ({len(proc.stdout)} bytes) exceeds safety limit ({max_pcm_bytes} bytes)"
+        )
     frame_bytes = channels * np.dtype("<f4").itemsize
     usable = len(proc.stdout) - (len(proc.stdout) % frame_bytes)
     return np.frombuffer(proc.stdout[:usable], dtype="<f4").reshape((-1, channels))
 
 
 def start_encoder(output_path: Path, sample_rate: int, channels: int, bitrate: str) -> subprocess.Popen:
+    if not BITRATE_RE.fullmatch(bitrate):
+        raise ValueError(f"Invalid audio bitrate: {bitrate!r}")
+    if output_path.is_symlink() or output_path.parent.is_symlink():
+        raise ValueError(f"Refusing symlinked encoder output path: {output_path}")
     output_path.parent.mkdir(parents=True, exist_ok=True)
     args = [
         "ffmpeg",
@@ -80,7 +101,8 @@ def start_encoder(output_path: Path, sample_rate: int, channels: int, bitrate: s
         "libmp3lame",
         "-b:a",
         bitrate,
-        str(output_path),
+        "--",
+        str(output_path.resolve()),
     ]
     return subprocess.Popen(args, stdin=subprocess.PIPE)
 
@@ -240,13 +262,28 @@ def mix_tracks(
     silence_threshold_db: float = -80.0,
     cue_padding_seconds: float = 0.25,
     manifest_path: Path | None = None,
+    overwrite: bool = False,
 ) -> dict:
     if not track_paths:
         raise ValueError("track_paths cannot be empty")
+    if not BITRATE_RE.fullmatch(bitrate):
+        raise ValueError(f"Invalid audio bitrate: {bitrate!r}")
     if mix_policy not in MIX_POLICIES:
         raise ValueError(f"mix_policy must be one of {', '.join(MIX_POLICIES)}")
     if quality_gate not in QUALITY_GATES:
         raise ValueError(f"quality_gate must be one of {', '.join(QUALITY_GATES)}")
+    if output_path.is_symlink() or output_path.parent.is_symlink():
+        raise ValueError(f"Refusing symlinked mix output path: {output_path}")
+    if manifest_path is not None and manifest_path.is_symlink():
+        raise ValueError(f"Refusing symlinked mix manifest path: {manifest_path}")
+    if not overwrite:
+        if output_path.exists():
+            raise FileExistsError(f"Refusing to overwrite existing mix output without --overwrite: {output_path}")
+        if manifest_path is not None and manifest_path.exists():
+            raise FileExistsError(f"Refusing to overwrite existing mix manifest without --overwrite: {manifest_path}")
+    for track in track_paths:
+        if track.is_symlink():
+            raise ValueError(f"Refusing symlinked input track: {track}")
 
     crossfade_samples = int(round(sample_rate * crossfade_seconds))
     if crossfade_samples < 0:
@@ -272,6 +309,8 @@ def mix_tracks(
             preflight_analyses[track] = analysis
 
     temp_output = output_path.with_name(f"{output_path.stem}.tmp{output_path.suffix}")
+    if temp_output.is_symlink():
+        raise ValueError(f"Refusing symlinked temporary output path: {temp_output}")
     if temp_output.exists():
         temp_output.unlink()
 
@@ -347,11 +386,15 @@ def mix_tracks(
 
         if encoder.stdin is not None:
             encoder.stdin.close()
-        rc = encoder.wait()
+        rc = encoder.wait(timeout=300)
         if rc != 0:
             raise RuntimeError(f"ffmpeg encoder failed with exit code {rc}")
 
         if output_path.exists():
+            if not overwrite:
+                raise FileExistsError(
+                    f"Refusing to overwrite output created concurrently without --overwrite: {output_path}"
+                )
             output_path.unlink()
         temp_output.replace(output_path)
     except Exception:

@@ -32,8 +32,8 @@ class FakeResponse:
     def getcode(self):
         return self.status
 
-    def read(self):
-        return self.body
+    def read(self, amt=None):
+        return self.body if amt is None else self.body[:amt]
 
 
 class HostedLargeTests(unittest.TestCase):
@@ -454,6 +454,21 @@ class HostedLargeTests(unittest.TestCase):
             self.assertEqual(code, 0)
             submit.assert_not_called()
             poll.assert_called_once()
+
+    def test_multipart_filename_is_sanitized_against_header_injection(self):
+        from legends_sa3.hosted import _safe_multipart_filename
+
+        injected = _safe_multipart_filename('evil"\r\nX-Injected: 1; name="x.wav')
+        self.assertNotIn('"', injected)
+        self.assertNotIn("\r", injected)
+        self.assertNotIn("\n", injected)
+        self.assertNotIn(";", injected)
+
+    def test_doctor_json_and_text_are_mutually_exclusive(self):
+        from legends_sa3.cli import build_parser
+
+        with self.assertRaises(SystemExit):
+            build_parser().parse_args(["doctor", "--json", "--text"])
 
 
 if __name__ == "__main__":

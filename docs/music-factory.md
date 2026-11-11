@@ -22,7 +22,7 @@ planning, and troubleshooting.
 - Crossfade: `12s`
 - Mix policy: `active-cue`
 - MP3 bitrate: `320k`
-- Steps: `12`
+- Steps: `8`
 - CFG scale: `1.0`
 
 ## Commands

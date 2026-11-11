@@ -115,7 +115,60 @@ def blend(
     raise ValueError("unknown curve")
 
 
-def render_arrangement(document: dict, output: Path, *, base: Path, rate: int = 44100) -> dict:
+def _has_symlink_in_relative_chain(base: Path, candidate: Path) -> bool:
+    current = candidate
+    while True:
+        if current.is_symlink():
+            return True
+        if current == base or current.parent == current:
+            break
+        current = current.parent
+    return False
+
+
+def _resolve_arrangement_tracks(
+    document: dict,
+    base: Path,
+    *,
+    allow_external_sources: bool = False,
+) -> list[Path]:
+    if base.is_symlink():
+        raise ValueError(f"Refusing symlinked arrangement base directory: {base}")
+    base_resolved = base.resolve()
+    raw_tracks = document.get("tracks", [])
+    if not isinstance(raw_tracks, list) or not raw_tracks:
+        raise ValueError("arrangement must contain a non-empty tracks list")
+    if len(raw_tracks) > 500:
+        raise ValueError("arrangement exceeds maximum 500 tracks")
+    paths: list[Path] = []
+    for entry in raw_tracks:
+        if not isinstance(entry, dict) or "source" not in entry:
+            raise ValueError("each track must be an object with a source field")
+        raw_source = str(entry["source"])
+        source_path = Path(raw_source)
+        candidate = source_path if source_path.is_absolute() else (base / source_path)
+        if source_path.is_symlink() or candidate.is_symlink() or _has_symlink_in_relative_chain(base, candidate):
+            raise ValueError(f"Refusing symlinked track source: {raw_source}")
+        resolved = candidate.resolve()
+        if not allow_external_sources and not resolved.is_relative_to(base_resolved):
+            raise ValueError(
+                f"Track source escapes arrangement base directory ({base_resolved}): {raw_source}"
+            )
+        if not resolved.is_file():
+            raise FileNotFoundError(f"Track source file not found: {raw_source}")
+        paths.append(resolved)
+    return paths
+
+
+def render_arrangement(
+    document: dict,
+    output: Path,
+    *,
+    base: Path,
+    rate: int = 44100,
+    overwrite: bool = False,
+    allow_external_sources: bool = False,
+) -> dict:
     """Stream explicit pairwise fades to float WAV; master/encode afterward.
 
     This renderer never optimizes to a target duration, guesses musical review,
@@ -123,10 +176,16 @@ def render_arrangement(document: dict, output: Path, *, base: Path, rate: int = 
     """
     if output.suffix.lower() != ".wav":
         raise ValueError("arrange renders WAV; master and encode delivery formats afterward")
+    if output.is_symlink() or output.parent.is_symlink():
+        raise ValueError("Refusing symlinked arrangement output path")
     manifest_path = output.with_suffix(".arrangement.json")
-    if output.exists() or manifest_path.exists():
-        raise FileExistsError("output or arrangement receipt already exists")
-    paths = [(base / t["source"]).resolve() for t in document["tracks"]]
+    if manifest_path.is_symlink():
+        raise ValueError("Refusing symlinked arrangement receipt path")
+    if (output.exists() or manifest_path.exists()) and not overwrite:
+        raise FileExistsError("output or arrangement receipt already exists; pass --overwrite to replace")
+    paths = _resolve_arrangement_tracks(
+        document, base, allow_external_sources=allow_external_sources
+    )
     durations = [len(decode_audio(p, rate, 2))/rate for p in paths]
     cuts = validate_arrangement(document, durations)
     joins = document.get("transitions", [])
@@ -134,7 +193,7 @@ def render_arrangement(document: dict, output: Path, *, base: Path, rate: int = 
     temporary = output.with_name(f"{output.stem}.{uuid.uuid4().hex}.tmp.wav")
     encoder = subprocess.Popen([
         "ffmpeg", "-v", "error", "-nostdin", "-f", "f32le", "-ar", str(rate),
-        "-ac", "2", "-i", "-", "-c:a", "pcm_f32le", str(temporary),
+        "-ac", "2", "-i", "-", "-c:a", "pcm_f32le", "--", str(temporary.resolve()),
     ], stdin=subprocess.PIPE)
     tail = None
     count = 0
@@ -181,8 +240,10 @@ def render_arrangement(document: dict, output: Path, *, base: Path, rate: int = 
                 "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
             })
         encoder.stdin.close()
-        if encoder.wait() != 0:
+        if encoder.wait(timeout=300) != 0:
             raise RuntimeError("arrangement encoder failed")
+        if output.exists() and not overwrite:
+            raise FileExistsError("output created concurrently; pass --overwrite to replace")
         temporary.replace(output)
     except BaseException:
         if encoder.poll() is None:

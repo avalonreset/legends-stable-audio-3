@@ -62,6 +62,8 @@ def run_doctor() -> DoctorReport:
 
 
 def assert_model_dir(model_dir: Path) -> None:
+    if model_dir.is_symlink():
+        raise ValueError(f"Refusing symlinked model directory: {model_dir}")
     required = [
         model_dir / "model_config.json",
         model_dir / "model.safetensors",
@@ -69,6 +71,11 @@ def assert_model_dir(model_dir: Path) -> None:
         model_dir / "t5gemma-b-b-ul2" / "model.safetensors",
         model_dir / "t5gemma-b-b-ul2" / "tokenizer.json",
     ]
+    if (model_dir / "t5gemma-b-b-ul2").is_symlink():
+        raise ValueError(f"Refusing symlinked conditioner directory in {model_dir}")
+    for req in required:
+        if req.is_symlink():
+            raise ValueError(f"Refusing symlinked model file: {req}")
     missing = [str(path.relative_to(model_dir)) for path in required if not path.exists()]
     if missing:
         raise FileNotFoundError(
@@ -78,7 +85,10 @@ def assert_model_dir(model_dir: Path) -> None:
         )
 
 
-def ffprobe_duration(path: Path) -> float:
+def ffprobe_duration(path: Path, *, timeout: float = 60.0) -> float:
+    if path.is_symlink():
+        raise ValueError(f"Refusing symlinked audio path: {path}")
+    resolved = path.resolve()
     proc = subprocess.run(
         [
             "ffprobe",
@@ -89,11 +99,13 @@ def ffprobe_duration(path: Path) -> float:
             "format=duration",
             "-of",
             "default=noprint_wrappers=1:nokey=1",
-            str(path),
+            "-i",
+            str(resolved),
         ],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         text=True,
+        timeout=timeout,
     )
     if proc.returncode != 0:
         raise RuntimeError(proc.stderr)

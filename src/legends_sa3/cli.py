@@ -14,6 +14,7 @@ from .hosted import (
     HostedAPIError,
     LargeRequest,
     poll_large_result,
+    reject_symlink_path,
     submit_large,
     write_public_receipt,
     write_recovery_receipt,
@@ -192,7 +193,11 @@ def cmd_doctor(args: argparse.Namespace) -> int:
 
 def cmd_download_model(args: argparse.Namespace) -> int:
     try:
-        path = download_model(args.model, Path(args.output))
+        path = download_model(
+            args.model,
+            Path(args.output),
+            revision=getattr(args, "revision", None),
+        )
     except (OSError, RuntimeError, ValueError) as error:
         raise SystemExit(str(error)) from error
     print(f"Downloaded model files to {path}")
@@ -242,25 +247,75 @@ def cmd_prompt(args: argparse.Namespace) -> int:
     return 0
 
 
+def _collect_safe_tracks(
+    input_dir: Path,
+    pattern: str,
+    *,
+    max_tracks: int = 500,
+) -> list[Path]:
+    reject_symlink_path(input_dir, "input_dir")
+    if not input_dir.is_dir():
+        raise ValueError(f"input_dir is not a directory: {input_dir}")
+    if (
+        not pattern
+        or ".." in pattern
+        or "/" in pattern
+        or "\\" in pattern
+        or ":" in pattern
+    ):
+        raise ValueError(
+            f"Unsafe glob pattern {pattern!r}; directory traversal and path separators are forbidden"
+        )
+    if max_tracks <= 0 or max_tracks > 5000:
+        raise ValueError("max_tracks must be between 1 and 5000")
+    base = input_dir.resolve()
+    tracks: list[Path] = []
+    for candidate in sorted(input_dir.glob(pattern)):
+        if candidate.is_symlink():
+            raise ValueError(f"Refusing symlinked track in {input_dir}: {candidate}")
+        resolved = candidate.resolve()
+        if not resolved.is_relative_to(base):
+            raise ValueError(f"Track escapes input_dir ({base}): {candidate}")
+        if resolved.is_file():
+            tracks.append(resolved)
+    if len(tracks) > max_tracks:
+        raise ValueError(
+            f"Found {len(tracks)} tracks in {input_dir}, exceeding --max-tracks limit ({max_tracks})"
+        )
+    return tracks
+
+
 def cmd_mix(args: argparse.Namespace) -> int:
     input_dir = Path(args.input_dir)
-    tracks = sorted(input_dir.glob(args.pattern))
+    max_tracks = getattr(args, "max_tracks", 500)
+    overwrite = bool(getattr(args, "overwrite", False))
+    try:
+        tracks = _collect_safe_tracks(input_dir, args.pattern, max_tracks=max_tracks)
+    except ValueError as error:
+        raise SystemExit(str(error)) from error
     if not tracks:
         raise SystemExit(f"No tracks found in {input_dir} using pattern {args.pattern}")
     output = Path(args.output)
-    manifest = mix_tracks(
-        tracks,
-        output,
-        crossfade_seconds=args.crossfade,
-        sample_rate=args.sample_rate,
-        bitrate=args.bitrate,
-        mix_policy=args.mix_policy,
-        quality_gate=args.quality_gate,
-        cue_threshold_db=args.cue_threshold_db,
-        silence_threshold_db=args.silence_threshold_db,
-        cue_padding_seconds=args.cue_padding_seconds,
-        manifest_path=output.with_suffix(output.suffix + ".manifest.json"),
-    )
+    manifest_target = output.with_suffix(output.suffix + ".manifest.json")
+    try:
+        reject_symlink_path(output, "output")
+        reject_symlink_path(manifest_target, "manifest")
+        manifest = mix_tracks(
+            tracks,
+            output,
+            crossfade_seconds=args.crossfade,
+            sample_rate=args.sample_rate,
+            bitrate=args.bitrate,
+            mix_policy=args.mix_policy,
+            quality_gate=args.quality_gate,
+            cue_threshold_db=args.cue_threshold_db,
+            silence_threshold_db=args.silence_threshold_db,
+            cue_padding_seconds=args.cue_padding_seconds,
+            manifest_path=manifest_target,
+            overwrite=overwrite,
+        )
+    except (FileExistsError, ValueError, RuntimeError) as error:
+        raise SystemExit(str(error)) from error
     duration = ffprobe_duration(output)
     print(f"output: {output}")
     print(f"rendered_seconds_estimate: {manifest['rendered_seconds_estimate']:.2f}")
@@ -270,9 +325,24 @@ def cmd_mix(args: argparse.Namespace) -> int:
 
 def cmd_analyze(args: argparse.Namespace) -> int:
     input_dir = Path(args.input_dir)
-    tracks = sorted(input_dir.glob(args.pattern))
+    max_tracks = getattr(args, "max_tracks", 500)
+    overwrite = bool(getattr(args, "overwrite", False))
+    try:
+        tracks = _collect_safe_tracks(input_dir, args.pattern, max_tracks=max_tracks)
+    except ValueError as error:
+        raise SystemExit(str(error)) from error
     if not tracks:
         raise SystemExit(f"No tracks found in {input_dir} using pattern {args.pattern}")
+    if args.json_output:
+        output = Path(args.json_output)
+        try:
+            reject_symlink_path(output, "json_output")
+        except ValueError as error:
+            raise SystemExit(str(error)) from error
+        if output.exists() and not overwrite:
+            raise SystemExit(
+                f"Refusing to overwrite existing json_output without --overwrite: {output}"
+            )
 
     rows = []
     for index, track in enumerate(tracks, start=1):
@@ -323,6 +393,11 @@ def cmd_analyze(args: argparse.Namespace) -> int:
 
 def cmd_generate(args: argparse.Namespace) -> int:
     output = Path(args.output)
+    overwrite = bool(getattr(args, "overwrite", False))
+    try:
+        reject_symlink_path(output, "output")
+    except ValueError as error:
+        raise SystemExit(str(error)) from error
     track_seconds = args.track_seconds
     if track_seconds == "auto":
         track_seconds = recommend_track_seconds(args.vram_gb)
@@ -335,47 +410,57 @@ def cmd_generate(args: argparse.Namespace) -> int:
         track_seconds=track_seconds,
         crossfade_seconds=args.crossfade,
     )
+    recipe = resolved_recipe(args)
+    label = args.style or recipe or "custom-style"
+    final = output / f"{slugify_style(label)}-{plan.final_seconds}s-master.mp3"
+    final_manifest = final.with_suffix(final.suffix + ".manifest.json")
+    if not overwrite and (final.exists() or final_manifest.exists()):
+        raise SystemExit(
+            f"Refusing to overwrite existing master mix without --overwrite: {final}"
+        )
     print(
         f"Plan: {plan.track_count} tracks x {plan.track_seconds}s with "
         f"{plan.crossfade_seconds}s crossfades = {plan.final_seconds}s"
     )
-    recipe = resolved_recipe(args)
     instrumental = not args.allow_vocals
     negative_prompt = resolved_negative_prompt(args)
-    tracks = generate_track_batch(
-        model_dir=Path(args.model_dir),
-        stable_audio_repo=Path(args.stable_audio_repo) if args.stable_audio_repo else None,
-        lora_ckpt_paths=[Path(path) for path in (args.lora_ckpt_paths or [])],
-        lora_strength=args.lora_strength,
-        output_dir=output,
-        recipe=recipe,
-        style=args.style,
-        track_count=plan.track_count,
-        track_seconds=plan.track_seconds,
-        steps=args.steps,
-        cfg_scale=args.cfg_scale,
-        seed_base=args.seed_base,
-        mp3_bitrate=args.bitrate,
-        bpm=args.bpm,
-        omit_bpm=args.omit_bpm,
-        negative_prompt=negative_prompt,
-        instrumental=instrumental,
-        custom_style=args.custom_style,
-    )
-    label = args.style or recipe or "custom-style"
-    final = output / f"{slugify_style(label)}-{plan.final_seconds}s-master.mp3"
-    mix_tracks(
-        tracks,
-        final,
-        crossfade_seconds=args.crossfade,
-        bitrate=args.bitrate,
-        mix_policy=args.mix_policy,
-        quality_gate=args.quality_gate,
-        cue_threshold_db=args.cue_threshold_db,
-        silence_threshold_db=args.silence_threshold_db,
-        cue_padding_seconds=args.cue_padding_seconds,
-        manifest_path=final.with_suffix(final.suffix + ".manifest.json"),
-    )
+    try:
+        tracks = generate_track_batch(
+            model_dir=Path(args.model_dir),
+            stable_audio_repo=Path(args.stable_audio_repo) if args.stable_audio_repo else None,
+            lora_ckpt_paths=[Path(path) for path in (args.lora_ckpt_paths or [])],
+            lora_strength=args.lora_strength,
+            output_dir=output,
+            recipe=recipe,
+            style=args.style,
+            track_count=plan.track_count,
+            track_seconds=plan.track_seconds,
+            steps=args.steps,
+            cfg_scale=args.cfg_scale,
+            seed_base=args.seed_base,
+            mp3_bitrate=args.bitrate,
+            bpm=args.bpm,
+            omit_bpm=args.omit_bpm,
+            negative_prompt=negative_prompt,
+            instrumental=instrumental,
+            custom_style=args.custom_style,
+            overwrite=overwrite,
+        )
+        mix_tracks(
+            tracks,
+            final,
+            crossfade_seconds=args.crossfade,
+            bitrate=args.bitrate,
+            mix_policy=args.mix_policy,
+            quality_gate=args.quality_gate,
+            cue_threshold_db=args.cue_threshold_db,
+            silence_threshold_db=args.silence_threshold_db,
+            cue_padding_seconds=args.cue_padding_seconds,
+            manifest_path=final_manifest,
+            overwrite=overwrite,
+        )
+    except (FileExistsError, FileNotFoundError, ValueError, RuntimeError) as error:
+        raise SystemExit(str(error)) from error
     print(f"final_mp3: {final}")
     return 0
 
@@ -441,14 +526,19 @@ def _validate_polling_args(*, poll_interval: float, result_timeout: float, reque
 
 
 def _large_output_paths(args: argparse.Namespace) -> tuple[Path, Path]:
-    output = Path(args.output).expanduser().resolve()
+    raw_output = Path(args.output)
+    reject_symlink_path(raw_output, "output")
+    output = raw_output.expanduser().resolve()
     if output.suffix.lower() != f".{args.output_format}":
         raise ValueError(f"output path must end in .{args.output_format}")
-    receipt = (
-        Path(args.receipt).expanduser().resolve()
-        if args.receipt
-        else Path(str(output) + ".receipt.json")
-    )
+    if args.receipt:
+        raw_receipt = Path(args.receipt)
+        reject_symlink_path(raw_receipt, "receipt")
+        receipt = raw_receipt.expanduser().resolve()
+    else:
+        raw_default_receipt = Path(str(raw_output.expanduser()) + ".receipt.json")
+        reject_symlink_path(raw_default_receipt, "receipt")
+        receipt = Path(str(output) + ".receipt.json")
     if output == receipt:
         raise ValueError("output and receipt paths must be different")
     if not args.overwrite:
@@ -704,10 +794,24 @@ def cmd_production_plan(args: argparse.Namespace) -> int:
 
 def cmd_arrange(args: argparse.Namespace) -> int:
     from .production import render_arrangement
-    plan_path = Path(args.plan).resolve()
+    raw_plan = Path(args.plan)
+    raw_output = Path(args.output)
     try:
+        reject_symlink_path(raw_plan, "arrangement plan")
+        reject_symlink_path(raw_output, "arrangement output")
+        if not raw_plan.is_file():
+            raise FileNotFoundError(f"Arrangement plan not found: {raw_plan}")
+        if raw_plan.stat().st_size > 1_048_576:
+            raise ValueError("Arrangement plan exceeds 1 MiB safety limit")
+        plan_path = raw_plan.resolve()
         document = json.loads(plan_path.read_text(encoding="utf-8"))
-        receipt = render_arrangement(document, Path(args.output), base=plan_path.parent)
+        receipt = render_arrangement(
+            document,
+            raw_output,
+            base=plan_path.parent,
+            overwrite=bool(getattr(args, "overwrite", False)),
+            allow_external_sources=bool(getattr(args, "allow_external_sources", False)),
+        )
     except (ValueError, KeyError, OSError, RuntimeError) as error:
         raise SystemExit(str(error)) from error
     print(json.dumps(receipt, indent=2))
@@ -731,17 +835,29 @@ def build_parser() -> argparse.ArgumentParser:
     arrange = sub.add_parser("arrange", help="Render explicit per-pair musical cues to WAV")
     arrange.add_argument("--plan", required=True)
     arrange.add_argument("--output", required=True)
+    arrange.add_argument("--overwrite", action="store_true", help="Overwrite existing output WAV and receipt")
+    arrange.add_argument(
+        "--allow-external-sources",
+        action="store_true",
+        help="Allow track sources outside the arrangement plan's parent directory",
+    )
     arrange.set_defaults(func=cmd_arrange)
 
     doctor = sub.add_parser("doctor")
     doctor.add_argument("--offline", action="store_true", help="Run offline readiness check")
-    doctor.add_argument("--json", action="store_true", help="Print machine-readable JSON")
-    doctor.add_argument("--text", action="store_true", help="Print human-readable key/value lines")
+    doctor_fmt = doctor.add_mutually_exclusive_group()
+    doctor_fmt.add_argument("--json", action="store_true", help="Print machine-readable JSON")
+    doctor_fmt.add_argument("--text", action="store_true", help="Print human-readable key/value lines")
     doctor.set_defaults(func=cmd_doctor)
 
     download = sub.add_parser("download-model")
     download.add_argument("--model", default="medium")
     download.add_argument("--output", required=True)
+    download.add_argument(
+        "--revision",
+        default=None,
+        help="Optional Hugging Face commit revision (defaults to the pinned upstream commit)",
+    )
     download.set_defaults(func=cmd_download_model)
 
     plan = sub.add_parser("plan")
@@ -762,21 +878,25 @@ def build_parser() -> argparse.ArgumentParser:
     mix.add_argument("--input-dir", required=True)
     mix.add_argument("--output", required=True)
     mix.add_argument("--pattern", default="*.mp3")
+    mix.add_argument("--max-tracks", type=int, default=500)
     mix.add_argument("--crossfade", type=float, default=12)
     mix.add_argument("--sample-rate", type=int, default=44_100)
     mix.add_argument("--bitrate", default="320k")
+    mix.add_argument("--overwrite", action="store_true", help="Overwrite existing output and manifest")
     add_mix_quality_args(mix)
     mix.set_defaults(func=cmd_mix)
 
     analyze = sub.add_parser("analyze")
     analyze.add_argument("--input-dir", required=True)
     analyze.add_argument("--pattern", default="*.mp3")
+    analyze.add_argument("--max-tracks", type=int, default=500)
     analyze.add_argument("--sample-rate", type=int, default=44_100)
     analyze.add_argument("--channels", type=int, default=2)
     analyze.add_argument("--cue-threshold-db", type=float, default=-50.0)
     analyze.add_argument("--silence-threshold-db", type=float, default=-80.0)
     analyze.add_argument("--cue-padding-seconds", type=float, default=0.25)
     analyze.add_argument("--json-output")
+    analyze.add_argument("--overwrite", action="store_true", help="Overwrite existing --json-output file")
     analyze.set_defaults(func=cmd_analyze)
 
     generate = sub.add_parser("generate")
@@ -799,6 +919,7 @@ def build_parser() -> argparse.ArgumentParser:
     generate.add_argument("--bitrate", default="320k")
     generate.add_argument("--custom-style")
     generate.add_argument("--output", required=True)
+    generate.add_argument("--overwrite", action="store_true", help="Overwrite existing master output and manifests")
     add_lora_args(generate)
     add_mix_quality_args(generate)
     generate.set_defaults(func=cmd_generate)

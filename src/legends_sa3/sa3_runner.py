@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 import sys
 import time
@@ -9,10 +10,15 @@ from pathlib import Path
 from .doctor import assert_model_dir
 from .prompts import NEGATIVE_PROMPT_INSTRUMENTAL, build_prompt
 
+BITRATE_RE = re.compile(r"^[1-9]\d{1,3}[kK]?$")
+MAX_CONFIG_BYTES = 1_048_576
+
 
 def add_stable_audio_repo(repo: Path | None) -> None:
     if repo is not None:
-        sys.path.insert(0, str(repo))
+        if repo.is_symlink():
+            raise ValueError(f"Refusing symlinked stable_audio_repo path: {repo}")
+        sys.path.insert(0, str(repo.resolve()))
 
 
 def load_model(model_dir: Path, stable_audio_repo: Path | None = None):
@@ -30,14 +36,20 @@ def load_model(model_dir: Path, stable_audio_repo: Path | None = None):
             "--stable-audio-repo, or run from an environment where stable_audio_3 is installed."
         ) from exc
 
-    with (model_dir / "model_config.json").open("r", encoding="utf-8") as f:
+    config_path = model_dir / "model_config.json"
+    weights_path = model_dir / "model.safetensors"
+    if config_path.is_symlink() or weights_path.is_symlink():
+        raise ValueError("Refusing symlinked model configuration or safetensors weights")
+    if config_path.stat().st_size > MAX_CONFIG_BYTES:
+        raise ValueError("model_config.json exceeds 1 MiB safety limit")
+    with config_path.open("r", encoding="utf-8") as f:
         model_config = json.load(f)
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
     model_half = device == "cuda"
     model = load_diffusion_cond(
         model_config,
-        str(model_dir / "model.safetensors"),
+        str(weights_path.resolve()),
         device=device,
         model_half=model_half,
     )
@@ -46,7 +58,17 @@ def load_model(model_dir: Path, stable_audio_repo: Path | None = None):
     return StableAudioModel(model, model_config, device, model_half), torch, torchaudio
 
 
-def convert_audio_to_mp3(input_path: Path, output_path: Path, bitrate: str) -> None:
+def convert_audio_to_mp3(
+    input_path: Path,
+    output_path: Path,
+    bitrate: str,
+    *,
+    timeout: float = 300.0,
+) -> None:
+    if not BITRATE_RE.fullmatch(bitrate):
+        raise ValueError(f"Invalid MP3 bitrate: {bitrate!r}")
+    if input_path.is_symlink() or output_path.is_symlink():
+        raise ValueError("Refusing symlinked audio input or MP3 output path")
     subprocess.run(
         [
             "ffmpeg",
@@ -55,15 +77,36 @@ def convert_audio_to_mp3(input_path: Path, output_path: Path, bitrate: str) -> N
             "error",
             "-y",
             "-i",
-            str(input_path),
+            str(input_path.resolve()),
             "-codec:a",
             "libmp3lame",
             "-b:a",
             bitrate,
-            str(output_path),
+            "--",
+            str(output_path.resolve()),
         ],
         check=True,
+        timeout=timeout,
     )
+
+
+def validate_lora_ckpt_paths(lora_ckpt_paths: list[Path]) -> list[Path]:
+    validated: list[Path] = []
+    missing_loras: list[str] = []
+    for path in lora_ckpt_paths:
+        if path.is_symlink():
+            raise ValueError(f"Refusing symlinked LoRA checkpoint: {path}")
+        if path.suffix.lower() != ".safetensors":
+            raise ValueError(
+                f"LoRA checkpoint must be a .safetensors file (pickle checkpoints are forbidden): {path}"
+            )
+        if not path.is_file():
+            missing_loras.append(str(path))
+        else:
+            validated.append(path.resolve())
+    if missing_loras:
+        raise FileNotFoundError(f"LoRA checkpoint not found: {', '.join(missing_loras)}")
+    return validated
 
 
 def generate_track_batch(
@@ -86,25 +129,38 @@ def generate_track_batch(
     negative_prompt: str | None = NEGATIVE_PROMPT_INSTRUMENTAL,
     instrumental: bool = True,
     custom_style: str | None = None,
+    overwrite: bool = False,
 ) -> list[Path]:
+    if not BITRATE_RE.fullmatch(mp3_bitrate):
+        raise ValueError(f"Invalid MP3 bitrate: {mp3_bitrate!r}")
+    if output_dir.is_symlink():
+        raise ValueError(f"Refusing symlinked output directory: {output_dir}")
+    manifest_file = output_dir / "manifest.json"
+    if manifest_file.is_symlink():
+        raise ValueError(f"Refusing symlinked manifest path: {manifest_file}")
+    if manifest_file.exists() and not overwrite:
+        raise FileExistsError(
+            f"Refusing to overwrite existing generation manifest without --overwrite: {manifest_file}"
+        )
+
     lora_ckpt_paths = lora_ckpt_paths or []
     if lora_strength is not None and not lora_ckpt_paths:
         raise ValueError("--lora-strength requires at least one --lora-ckpt-path")
-    missing_loras = [str(path) for path in lora_ckpt_paths if not path.exists()]
-    if missing_loras:
-        raise FileNotFoundError(f"LoRA checkpoint not found: {', '.join(missing_loras)}")
+    validated_loras = validate_lora_ckpt_paths(lora_ckpt_paths)
 
     model, torch, torchaudio = load_model(model_dir, stable_audio_repo)
     sample_rate = model.model.sample_rate
     sample_size = model.model_config["sample_size"]
-    if lora_ckpt_paths:
-        print(f"Loading {len(lora_ckpt_paths)} Stable Audio 3 LoRA adapter(s)", flush=True)
-        model.load_lora([str(path) for path in lora_ckpt_paths])
+    if validated_loras:
+        print(f"Loading {len(validated_loras)} Stable Audio 3 LoRA adapter(s)", flush=True)
+        model.load_lora([str(path) for path in validated_loras])
         if lora_strength is not None:
             model.set_lora_strength(lora_strength)
 
     track_dir = output_dir / "tracks_mp3"
     temp_dir = output_dir / "tmp_wav"
+    if track_dir.is_symlink() or temp_dir.is_symlink():
+        raise ValueError(f"Refusing symlinked track or temporary directory inside {output_dir}")
     track_dir.mkdir(parents=True, exist_ok=True)
     temp_dir.mkdir(parents=True, exist_ok=True)
 
@@ -141,10 +197,17 @@ def generate_track_batch(
         slug = f"{index:03d}"
         mp3_path = track_dir / f"{slug}.mp3"
         wav_path = temp_dir / f"{slug}.wav"
+        if mp3_path.is_symlink() or wav_path.is_symlink():
+            raise ValueError(f"Refusing symlinked track or temporary audio file: {mp3_path}")
         track_paths.append(mp3_path)
-        if mp3_path.exists() and mp3_path.stat().st_size > 1_000_000:
-            print(f"[{index:03d}/{track_count:03d}] Skipping existing {mp3_path.name}", flush=True)
-            continue
+        if mp3_path.exists():
+            if not overwrite:
+                if mp3_path.stat().st_size > 1_000_000:
+                    print(f"[{index:03d}/{track_count:03d}] Skipping existing {mp3_path.name}", flush=True)
+                    continue
+                raise RuntimeError(
+                    f"Refusing to overwrite existing track without --overwrite: {mp3_path}"
+                )
 
         prompt, track_bpm = build_prompt(
             recipe,

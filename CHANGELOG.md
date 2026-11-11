@@ -2,6 +2,20 @@
 
 All notable changes to `legends-stable-audio-3` will be documented here.
 
+## 0.1.5 - 2026-11-10
+
+### Added
+
+- Added `--overwrite` and `--allow-external-sources` flags to `legends-sa3 arrange`, `--overwrite` and `--max-tracks` to `legends-sa3 mix` and `legends-sa3 analyze`, `--overwrite` to `legends-sa3 generate`, and `--revision` to `legends-sa3 download-model`.
+- Added `assets/stable-audio-3-youtube.png`, `bytes`, and `sha256` integrity entries to `assets/manifest.json` and expanded `scripts/check_release.py` to match the Gold-Standard static gate.
+
+### Security
+
+- Enforced symlink refusal (`CWE-59`), `1 MiB` JSON plan bounds, and base-directory path containment (`CWE-22`) on `arrange` manifests, `mix`, `analyze`, `generate`, and `hosted` receipt/output paths prior to `.resolve()`.
+- Enforced `.safetensors`-only validation on `--lora-ckpt-path` in `sa3_runner.py` (`CWE-502`) and pinned default Hugging Face revision with pickle weight exclusion patterns (`*.bin`, `*.ckpt`, `*.pkl`, `*.pt`, `*.pth`) in `hf_download.py` (`CWE-494`).
+- Hardened `ffprobe` and `ffmpeg` invocations with explicit `-i` / `--` argument terminators (`CWE-88`), strict `--bitrate` regex validation, subprocess timeouts, and `512 MiB` decoded PCM buffer bounds (`CWE-400`).
+- Sanitized multipart upload filenames (`CWE-93`) and bounded HTTP response reads in `hosted.py`.
+
 ## 0.1.4 - 2026-11-05
 
 ### Added

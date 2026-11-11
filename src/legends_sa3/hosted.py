@@ -7,6 +7,7 @@ import mimetypes
 import os
 import re
 import secrets
+import sys
 import time
 import urllib.error
 import urllib.request
@@ -22,10 +23,46 @@ OPERATIONS = ("text-to-audio", "audio-to-audio", "inpaint")
 GENERATION_ID = re.compile(r"^[A-Za-z0-9_-]+$")
 RETRYABLE_RESULT_STATUS = {429, 500, 502, 503, 504}
 MAX_UPLOAD_BYTES = 100 * 1024 * 1024
+MAX_JSON_RESPONSE_BYTES = 1 * 1024 * 1024
+MAX_AUDIO_RESPONSE_BYTES = 250 * 1024 * 1024
+_MACOS_SYSTEM_SYMLINKS = {Path("/var"), Path("/tmp"), Path("/etc")}
 
 
 class HostedAPIError(RuntimeError):
     pass
+
+
+def reject_symlink_path(path: Path, label: str = "path") -> None:
+    """Refuse symlinked files or non-system parent directories before resolving."""
+    expanded = path.expanduser()
+    if expanded.is_symlink():
+        raise ValueError(f"Refusing symlinked {label}: {path}")
+    current = expanded.parent
+    while True:
+        if current.is_symlink():
+            if sys.platform == "darwin" and current in _MACOS_SYSTEM_SYMLINKS:
+                break
+            raise ValueError(f"Refusing symlinked parent directory for {label}: {current}")
+        if current.parent == current:
+            break
+        current = current.parent
+
+
+def _safe_multipart_filename(name: str) -> str:
+    cleaned = re.sub(r"[^A-Za-z0-9._-]", "_", Path(name).name)
+    return cleaned or "audio.bin"
+
+
+def _read_bounded(stream, max_bytes: int) -> bytes:
+    try:
+        payload = stream.read(max_bytes + 1)
+    except TypeError:
+        payload = stream.read()
+    if len(payload) > max_bytes:
+        raise HostedAPIError(
+            f"Stability API response exceeded maximum size ({max_bytes} bytes)"
+        )
+    return payload
 
 
 class _RejectRedirects(urllib.request.HTTPRedirectHandler):
@@ -95,6 +132,7 @@ class LargeRequest:
             return
         if self.audio is None:
             raise ValueError(f"{self.operation} requires --audio")
+        reject_symlink_path(self.audio, "audio input")
         if not self.audio.is_file():
             raise ValueError(f"audio file does not exist: {self.audio}")
         if self.audio.suffix.lower() not in {".mp3", ".wav"}:
@@ -158,10 +196,12 @@ def _encode_multipart(request: LargeRequest) -> tuple[bytes, str]:
         body.extend(value.encode("utf-8"))
         body.extend(b"\r\n")
     if request.audio:
-        mime = mimetypes.guess_type(request.audio.name)[0] or "application/octet-stream"
+        reject_symlink_path(request.audio, "audio input")
+        safe_name = _safe_multipart_filename(request.audio.name)
+        mime = mimetypes.guess_type(safe_name)[0] or "application/octet-stream"
         body.extend(f"--{boundary}\r\n".encode())
         body.extend(
-            f'Content-Disposition: form-data; name="audio"; filename="{request.audio.name}"\r\n'.encode()
+            f'Content-Disposition: form-data; name="audio"; filename="{safe_name}"\r\n'.encode()
         )
         body.extend(f"Content-Type: {mime}\r\n\r\n".encode())
         body.extend(request.audio.read_bytes())
@@ -171,7 +211,7 @@ def _encode_multipart(request: LargeRequest) -> tuple[bytes, str]:
 
 
 def _api_error(error: urllib.error.HTTPError) -> HostedAPIError:
-    payload = error.read().decode("utf-8", errors="replace")
+    payload = _read_bounded(error, MAX_JSON_RESPONSE_BYTES).decode("utf-8", errors="replace")
     return HostedAPIError(f"Stability API HTTP {error.code}: {payload[:1000]}")
 
 
@@ -225,7 +265,7 @@ def submit_large(request: LargeRequest, api_key: str, *, timeout: float = 120) -
     try:
         with _open_url(http_request, timeout=timeout) as response:
             status = response.getcode()
-            raw_payload = response.read()
+            raw_payload = _read_bounded(response, MAX_JSON_RESPONSE_BYTES)
             response_content_type = response.headers.get("Content-Type", "")
     except urllib.error.HTTPError as error:
         raise _api_error(error) from error
@@ -276,6 +316,7 @@ def poll_large_result(
         raise ValueError("timeout must be greater than zero")
     if max_retries < 0:
         raise ValueError("max_retries must be zero or greater")
+    reject_symlink_path(output, "output path")
     output = output.expanduser().resolve()
     if output.suffix.lower() != f".{output_format}":
         raise ValueError(f"output path must end in .{output_format}")
@@ -299,7 +340,7 @@ def poll_large_result(
         try:
             with _open_url(http_request, timeout=min(120, remaining)) as response:
                 status = response.getcode()
-                payload = response.read()
+                payload = _read_bounded(response, MAX_AUDIO_RESPONSE_BYTES)
                 headers = response.headers
         except urllib.error.HTTPError as error:
             if error.code not in RETRYABLE_RESULT_STATUS or consecutive_retries >= max_retries:
@@ -432,6 +473,7 @@ def write_recovery_receipt(
 
 
 def _write_receipt(path: Path, receipt: dict[str, object], *, overwrite: bool) -> Path:
+    reject_symlink_path(path, "receipt path")
     path = path.expanduser().resolve()
     if path.exists() and not overwrite:
         raise FileExistsError(f"Refusing to overwrite existing receipt without --overwrite: {path}")
