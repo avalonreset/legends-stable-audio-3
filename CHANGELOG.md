@@ -2,6 +2,17 @@
 
 All notable changes to `legends-stable-audio-3` will be documented here.
 
+## 0.1.6 - 2026-11-21
+
+### Added
+
+- Added `scripts/render_cards.py` and the 7 outlined Legends Font `r1` SVG design cards under `assets/cards/r1/` (`slot-1-agent-handoff.svg`, `slot-2-three-pillars.svg`, `slot-3-plain-english-chains.svg`, `slot-4-stable-audio-architecture.svg`, `slot-5-adhoc-vs-stable-audio.svg`, `slot-7-message-avalon-reset.svg`, and `slot-collection-star-shrine.svg`).
+
+### Changed
+
+- Rewrote `README.md` to the evergreen CTO Legends standard with copy-paste agent handoff, visual plain-english operator prompt chains, two-chamber preview-first and active-cue mastering architecture, ad-hoc vs deterministic audio studio comparison matrix, and collapsible reference drawers.
+- Removed the duplicate root `assets/collection-star-shrine.svg` in favor of `assets/cards/r1/slot-collection-star-shrine.svg`.
+
 ## 0.1.5 - 2026-11-10
 
 ### Added

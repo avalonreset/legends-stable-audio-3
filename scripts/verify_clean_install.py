@@ -31,7 +31,7 @@ def verify_artifact(artifact: Path, label: str) -> None:
             text=True,
             capture_output=True,
         ).stdout.strip()
-        if version_out != "legends-sa3 0.1.5":
+        if version_out != "legends-sa3 0.1.6":
             raise RuntimeError(f"Unexpected version output: {version_out!r}")
         run([str(cli), "skill", "validate"])
         install_target = root / "skills"
@@ -89,10 +89,10 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Install and smoke-test built wheel and source artifacts.")
     parser.add_argument("--dist", type=Path, default=Path("dist"))
     args = parser.parse_args()
-    wheels = sorted(args.dist.glob("legends_stable_audio_3-0.1.5-*.whl"))
-    sdists = sorted(args.dist.glob("legends_stable_audio_3-0.1.5.tar.gz"))
+    wheels = sorted(args.dist.glob("legends_stable_audio_3-0.1.6-*.whl"))
+    sdists = sorted(args.dist.glob("legends_stable_audio_3-0.1.6.tar.gz"))
     if len(wheels) != 1 or len(sdists) != 1:
-        raise SystemExit("Expected exactly one v0.1.5 wheel and one v0.1.5 sdist")
+        raise SystemExit("Expected exactly one v0.1.6 wheel and one v0.1.6 sdist")
     verify_artifact(wheels[0].resolve(), "wheel")
     verify_artifact(sdists[0].resolve(), "sdist")
     return 0

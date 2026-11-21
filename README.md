@@ -5,460 +5,186 @@
 
 [![release](https://img.shields.io/github/v/release/avalonreset/legends-stable-audio-3?label=release&sort=date&style=flat-square&labelColor=000000&color=ff0000)](https://github.com/avalonreset/legends-stable-audio-3/releases/latest)
 [![checks](https://img.shields.io/github/actions/workflow/status/avalonreset/legends-stable-audio-3/ci.yml?branch=main&label=checks&style=flat-square&labelColor=000000)](https://github.com/avalonreset/legends-stable-audio-3/actions/workflows/ci.yml)
+[![python](https://img.shields.io/badge/python-3.11%2B-000000?style=flat-square&labelColor=000000&color=ff0000)](pyproject.toml)
+[![surface](https://img.shields.io/badge/surfaces-local%20medium%20%2B%20hosted%20large%20%2B%20cue%20mixer-000000?style=flat-square&labelColor=000000&color=ff0000)](docs/AGENT-RECIPE.md)
 [![license](https://img.shields.io/github/license/avalonreset/legends-stable-audio-3?label=license&style=flat-square&labelColor=000000&color=666666)](LICENSE)
 
-Run Stable Audio 3 with an agent: turn a creative brief into prompts and a
-hardware-aware plan, generate resumable batches, and assemble verified continuous
-mixes. The same toolkit supports local Medium and guarded hosted Large jobs.
-Its operating instructions travel with the installed skill.
+**Deterministic Stable Audio CLI studio (`legends-sa3`) for coding agents: preview-first text-to-audio, audio-to-audio, and inpainting generation, duration/seed/steps/cfg-scale parameter and credit guardrails, VRAM-calibrated local GPU batches, SHA-256 WAV/MP3 stem banking, and active-cue loudness mastering.**
 
-## Agent setup (via `cto-legends`)
+![Agent Handoff](assets/cards/r1/slot-1-agent-handoff.svg)
 
-Part of the [CTO Legends](https://github.com/avalonreset/cto-legends) ecosystem. `cto-legends` is the only registered skill; this repo vendors a pinned copy at `skills/cto-legends/SKILL.md`.
+```text
+Install or update legends-stable-audio-3 via cto-legends (https://github.com/avalonreset/cto-legends): run `cto-legends install legends-stable-audio-3 --apply`, then `cto-legends handoff legends-stable-audio-3` and follow the returned JSON recipe to verify `legends-sa3`.
+```
 
-Install with `cto-legends install legends-stable-audio-3`, then follow the module recipe the router loads. Do not register this module as its own skill.
-
-[first run](docs/first-run.md) · [install](#install-the-agent-skill) ·
-[choose a surface](#choose-your-surface) · [local generation](#local-medium-quick-start) ·
-[mixing](#long-duration-assembly) · [troubleshooting](docs/troubleshooting.md) ·
-[all guides](#documentation)
+![Three Pillars: Text & audio-to-audio, Cost & seed guardrails, SHA-256 WAV/MP3 banking](assets/cards/r1/slot-2-three-pillars.svg)
 
 <p align="left">
   <a href="https://www.youtube.com/watch?v=ZMF28c_M7OU">
-    <img src="assets/stable-audio-3-youtube.png" alt="stable-audio-3 music production walkthrough - watch on YouTube" width="560" height="560">
+    <img src="assets/stable-audio-3-youtube.png" alt="legends-stable-audio-3 music production walkthrough on YouTube" width="560" height="560">
   </a>
 </p>
 <p align="left">
   <a href="https://www.youtube.com/watch?v=ZMF28c_M7OU"><em>just use freaking stable-audio-3 for all of your music beds from now on</em></a>
 </p>
 
-legends-stable-audio-3 keeps local Medium, hosted Large, the Stable Audio web
-studio, the DAW plugin, and downstream mixing distinct. Its CLI handles local
-model access, setup, prompting, VRAM-aware planning, generation, resumable
-batches, guarded paid API jobs, and final audio assembly. One supported workflow
-can fill hours of background music by generating multiple coherent tracks and
-crossfading them, but the project is not limited to long-form or background
-music.
-
-Stable Audio 3 Medium is not a Suno-style lyric-to-song system. The local CLI is
-strongest for instrumental music, music beds, samples, sound effects, adapter
-experiments, and long-form mixes assembled from fresh segments. The guarded
-hosted Large client adds text-to-audio, audio-to-audio, and inpainting. Medium
-can sometimes create vocal-like textures, but it does not reliably generate
-intelligible sung lyrics.
-
-## Why use Legends instead of approaching the model cold?
-
-A generic request such as `make a dark cinematic techno track` leaves the agent
-to guess the surface, prompt structure, duration, BPM strategy, sampler settings,
-seed policy, and recovery path. Legends gives the agent a repeatable operating
-method:
-
-1. Route the request to local Medium, hosted Large, the web studio, the plugin,
-   or downstream mixing without silently substituting one for another.
-2. Turn the creative brief into concrete musical metadata plus concise prose.
-3. Calibrate hosted full songs at 380 seconds before expanding the paid batch;
-   keep local hardware trials and short-cue requests distinct.
-4. Choose duration, BPM, steps, CFG, and VRAM-aware segment sizes deliberately.
-5. Preserve source audio, generation IDs, hashes, and resumable public-safe
-   receipts.
-6. Analyze active cues and assemble long masters without dead-air crossfades or
-   one enormous FFmpeg graph.
-
-That operating intelligence ships inside the skill. It is the product-not a
-link back to a private development vault.
-
-## Choose your surface
-
-| Goal | Legends route |
-|---|---|
-| Give an agent the full Stable Audio 3 operating method | Install or open the canonical skill |
-| Run Stable Audio 3 Medium locally | Local CLI, official runtime, gated model bundle, and a hardware-appropriate PyTorch install |
-| Use Stable Audio 3 Large through the API | Guarded `large plan/generate/result` workflow with explicit paid confirmation and recovery |
-| Work in Stable Audio's web studio or DAW plugin | Bundled routing and production guidance; no false claim of end-to-end browser automation |
-| Analyze or assemble existing tracks | Active-cue analysis and streaming crossfade mixer |
-
-## Install the agent skill
-
-**Try the planner before downloading a model.** The [first-run guide](docs/first-run.md)
-checks the installed skill, previews a prompt, and calculates a ten-hour mix on
-an ordinary CPU. These steps require no GPU, model weights, or paid API account.
-
-### Source checkout
-
-Clone the repository and open that directory in your agent client.
-`AGENTS.md` holds build and test instructions. The repo vendors the pinned
-`cto-legends` router skill at `skills/cto-legends/SKILL.md`; it registers no
-per-module skill of its own.
-
-```bash
-git clone https://github.com/avalonreset/legends-stable-audio-3.git
-cd legends-stable-audio-3
-```
-
-To install the packaged operating bundle into a configured directory-based
-Agent Skills target, install the release wheel and choose the target explicitly:
-
-```bash
-python -m pip install "https://github.com/avalonreset/legends-stable-audio-3/releases/download/v0.1.5/legends_stable_audio_3-0.1.5-py3-none-any.whl"
-legends-sa3 skill validate
-legends-sa3 skill install --target <skills-directory>
-```
-
-The installer creates `<skills-directory>/legends-stable-audio-3` and refuses
-to replace an existing copy. Client discovery locations vary, so it never
-guesses or edits global agent configuration.
-
-## What it does
-
-- Helps users install the Stable Audio 3 runtime.
-- Helps users download model files after they accept Stability AI's gated terms.
-- Helps agents shape prompts, recipes, negative prompts, and repeatable settings.
-- Detects or accepts VRAM limits and recommends practical segment lengths.
-- Accepts free-form style prompts directly, with optional recipes for repeatable
-  scaffolding.
-- Previews expanded Stable Audio prompts before a long run.
-- Generates one-off instrumental tracks or batches in Stable Audio 3-supported
-  music styles.
-- Manages an optional Underfit-powered LoRA Studio workflow for training custom
-  Stable Audio 3 adapters.
-- Runs local Medium prompt-to-audio batches and guarded hosted Large
-  text-to-audio, audio-to-audio, and inpainting jobs.
-- Gives agents explicit web-studio, DAW-plugin, prompting, benchmarking, and
-  receipt guidance without pretending those are local CLI features.
-- Analyzes generated source tracks for quiet heads/tails before mixing.
-- Optionally renders a long continuous MP3 by streaming crossfades between tracks.
-- Analyzes track heads, tails, and active cue points before long MP3 assembly.
-- Keeps source tracks and manifests so interrupted runs can resume.
-
-## What it does not do
-
-- It does not package, mirror, or redistribute Stable Audio model weights.
-- It does not bypass Hugging Face gated model approval.
-- It does not promise that a user's generated output is commercially safe.
-  Users must read and comply with the model license and their local laws.
-- It does not turn typed lyrics into clean sung songs. Stable Audio 3's official
-  docs say the models do not output intelligible vocals and are not designed for
-  speech or voice generation.
-- `--allow-vocals` does not enable lyric singing. It only removes this wrapper's
-  default instrumental bias so users can experiment with vocal-like textures.
-- Its Apache-2.0 source license does not cover model weights, adapters, datasets,
-  hosted services, third-party software, or generated media.
-
-## Local Medium quick start
-
-From the source checkout on Windows PowerShell:
-
-```powershell
-python -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -e ".[download]"
-.\.venv\Scripts\legends-sa3.exe doctor
-.\.venv\Scripts\legends-sa3.exe skill validate
-.\.venv\Scripts\legends-sa3.exe download-model --model medium --output .\models\stable-audio-3-medium
-.\.venv\Scripts\legends-sa3.exe plan --minutes 4 --vram-gb 24 --crossfade 12
-```
-
-On Linux or macOS:
-
-```bash
-python3 -m venv .venv
-./.venv/bin/python -m pip install -e '.[download]'
-./.venv/bin/legends-sa3 doctor
-./.venv/bin/legends-sa3 skill validate
-./.venv/bin/legends-sa3 download-model --model medium --output ./models/stable-audio-3-medium
-./.venv/bin/legends-sa3 plan --minutes 4 --vram-gb 24 --crossfade 12
-```
-
-Before `download-model`, accept the Stability AI terms for the gated model and
-the bundled T5Gemma conditioner, then authenticate with Hugging Face yourself.
-This project never bundles weights or bypasses approval. Install the separate
-`[generate]` extra only after selecting the hardware-appropriate PyTorch build;
-local Medium is a supported CUDA path on Windows/Linux and a CPU fallback on
-macOS, not a claimed MPS-accelerated workflow.
-
-Preview a hosted Stable Audio 3 Large REST request without spending credits:
-
-```powershell
-legends-sa3 large plan `
-  --operation text-to-audio `
-  --prompt "TrackType: Music, VocalType: Instrumental, deep dub techno, 118 BPM" `
-  --duration 380 --seed 42 --steps 8 --cfg-scale 1 --output-format wav
-```
-
-After verifying live Platform pricing and balance, load `STABILITY_API_KEY`
-from a secret store and add `--confirmed-live-credits <n> --confirm-paid` to a
-`legends-sa3 large generate` command. It submits the asynchronous job, polls the
-result endpoint, downloads and hashes the audio, and writes a secret-free JSON
-receipt. See the bundled `references/large-api.md` for text-to-audio,
-audio-to-audio, and inpaint examples and boundaries.
-
-The generation ID is preserved in a pending receipt before polling. Resume an
-interrupted paid job with `legends-sa3 large result --generation-id <id>
---output <file>` rather than submitting it again. Existing outputs and receipts
-are protected unless `--overwrite` is explicit, uploaded audio is preflighted
-with `ffprobe`, and downloaded bytes are validated before writing.
-
-Preview the prompts before spending GPU time:
-
-```powershell
-legends-sa3 prompt `
-  --style "trance hip hop jazz, smoky saxophone, broken beat drums, 104 BPM" `
-  --count 3
-```
-
-Generate a single prompt-guided track:
-
-```powershell
-legends-sa3 generate `
-  --model-dir .\models\stable-audio-3-medium `
-  --stable-audio-repo ..\stable-audio-3 `
-  --style "trance hip hop jazz, smoky saxophone, broken beat drums, 104 BPM" `
-  --minutes 6 `
-  --vram-gb 24 `
-  --output .\output\trance-hip-hop-jazz
-```
-
-Generate a long continuous background mix by sequencing many tracks:
-
-```powershell
-legends-sa3 generate `
-  --model-dir .\models\stable-audio-3-medium `
-  --stable-audio-repo ..\stable-audio-3 `
-  --style "lo-fi study hip hop, warm Rhodes, soft boom bap drums, no vocals" `
-  --hours 10 `
-  --vram-gb 24 `
-  --output .\output\lofi-study-10h
-```
-
-Generate with a native Stable Audio 3 LoRA or DoRA adapter:
-
-```powershell
-legends-sa3 generate `
-  --model-dir .\models\stable-audio-3-medium `
-  --stable-audio-repo ..\stable-audio-3 `
-  --style "digital hardcore breakbeat trance, acidic bassline, no vocals, 172 BPM" `
-  --minutes 6 `
-  --vram-gb 24 `
-  --lora-ckpt-path .\adapters\eisbach-medium\model.safetensors `
-  --lora-strength 1.0 `
-  --output .\output\eisbach-breakbeat-test
-```
-
-Install the optional Underfit LoRA Studio bridge:
-
-```powershell
-legends-sa3 lora-studio install
-legends-sa3 lora-studio status
-```
-
-The bridge fetches only the reviewed Underfit commit
-`8a96800a58c0e8b82327fc04ac31c473ed900b73` and verifies the origin, commit,
-required files, and MIT license hash before execution. The default command only
-checks out code. `--run-underfit-install` executes downloaded third-party shell
-code that bootstraps/synchronizes Python tooling and can, with `--with-setup`,
-clone runtime code or download large gated model packs. Review it first and
-accept model terms yourself.
-
-After training in Underfit, import a checkpoint into the Legends adapter
-registry:
-
-```powershell
-legends-sa3 lora-studio import `
-  .\state\runs\my-style\5000.safetensors `
-  --name my-style `
-  --source-run my-style
-```
-
-Mix an existing folder of MP3 tracks:
-
-```powershell
-legends-sa3 mix `
-  --input-dir .\output\lofi-study-10h\tracks_mp3 `
-  --output .\output\lofi-study-10h\lofi-study-10h-master.mp3 `
-  --crossfade 12 `
-  --mix-policy active-cue
-```
-
-Analyze generated source tracks before mixing:
-
-```powershell
-legends-sa3 analyze `
-  --input-dir .\output\lofi-study-10h\tracks_mp3 `
-  --json-output .\output\lofi-study-10h\track-analysis.json
-```
-
-## Practical Defaults
-
-The defaults are based on the RTX 4090 24 GB test run:
-
-- Model: `stabilityai/stable-audio-3-medium`
-- Practical single-generation length: about `380s` on 24 GB VRAM
-- Crossfade: `12s`
-- Default mix policy: `active-cue`
-- Steps: `8`
-- CFG scale: `1.0`
-- Output: stereo MP3, `44.1 kHz`, `320 kbps`
-
-For lower VRAM cards, start lower:
-
-- 8 GB: `90s` to `120s`
-- 12 GB: `150s` to `180s`
-- 16 GB: `210s` to `240s`
-- 24 GB class: `360s` to `380s`
-
-Run `legends-sa3 plan --hours 1 --vram-gb 16` to see the exact segment count.
-
-## Prompt-First Workflow
-
-Stable Audio 3 responds best to concrete musical language: genre, instruments,
-mood or energy, BPM, and production character. legends-stable-audio-3 therefore
-uses free-form `--style` prompts as the primary workflow.
-
-Recipes are optional scaffolds for repeatable batches. They are not a catalog of
-everything the model can do, and users should not need a preset before asking for
-something like "trance hip hop jazz" or "cinematic gospel house with breakbeats."
-
-Current recipes:
-
-- `lofi-study`
-- `trip-hop-trance`
-
-## Vocal And Lyric Boundary
-
-Do not position Stable Audio 3 Medium as a lyric or clean-vocal generator.
-
-The model can be prompted with vocal language, but its own prompting guide says it
-does not output intelligible vocals. In practice, vocal prompts often produce
-vocal-like pads, chants, vowel textures, or gibberish. That can be useful for
-sound design, but it is not a reliable song-with-lyrics workflow.
-
-For release examples and user-facing demos, prefer instrumental music, background
-beds, samples, sound effects, solo instruments, audio-to-audio edits,
-inpainting, continuation, and long MP3 mixes.
-
-## Long-Duration Assembly
-
-Stable Audio 3 does not create a ten-hour file in a single generation. This
-operator handles that by planning multiple separate generations, keeping them in
-the same creative lane, and streaming them into one master with smooth crossfades.
-That gives users a practical way to create long background beds without looping
-the same song for hours.
-
-## Full-song hosted production
-
-Hosted Large full songs default to 380 seconds. Generate one full-length
-candidate before expanding; preserve and reuse good recordings. Short cues and
-SFX use an explicit duration. The upstream API's omitted default remains 190s.
+## Why `legends-stable-audio-3` exists
+
+Most ad-hoc generative audio scripts break down as soon as a coding agent moves past a single toy clip:
+
+1. **Unbounded durations, unseeded prompts, and GPU OOM crashes:** Asking an agent to "make a 2-hour background track" without hardware-calibrated segment math or explicit `duration`, `seed`, `steps`, and `cfg_scale` bounds either crashes local VRAM mid-render or produces unrepeatable clips with garbled vocal artifacts.
+2. **Blind paid API calls and lost generation credits:** Firing raw HTTP POST requests at hosted Stable Audio endpoints without an offline plan check or an immediate on-disk recovery receipt means any transient network drop during polling forces your agent to re-submit and double-bill your account.
+3. **Dead-air intros and RAM-crashing FFmpeg filter graphs:** Generative audio models frequently pad track heads and tails with near-silent dead air. Feeding thirty raw tracks into a single monolithic FFmpeg filter graph exhausts workstation memory and leaves awkward silent gaps at every crossfade before you can score a video for [`legends-youtube`](https://github.com/avalonreset/legends-youtube), [`legends-captions`](https://github.com/avalonreset/legends-captions), or [`legends-obs`](https://github.com/avalonreset/legends-obs).
+
+`legends-stable-audio-3` gives coding agents a deterministic audio studio via the `legends-sa3` CLI. It keeps local Medium GPU inference, guarded hosted Large API jobs (`text-to-audio`, `audio-to-audio`, and `inpaint`), pinned Underfit LoRA adapter training, and active-cue floating-point stem mastering distinct and verifiable.
+
+## Ask in plain english
+
+Once [`cto-legends`](https://github.com/avalonreset/cto-legends) is installed, you ask your coding agent in plain english. It previews prompts and parameter bounds offline first, enforces credit and VRAM guardrails, banks every WAV or MP3 stem with SHA-256 provenance, and trims dead air before mastering:
+
+![Say the job in plain words](assets/cards/r1/slot-3-plain-english-chains.svg)
+
+## Architecture: preview-first guardrails and active-cue stem mastering
+
+![How preview-first generation and active-cue stem mastering work](assets/cards/r1/slot-4-stable-audio-architecture.svg)
+
+### 1. Preview-first generation, parameter bounds, and two-step credit guardrails (`plan` and `large`)
+
+Before touching GPU weights or spending a single hosted API credit, `legends-sa3` validates every parameter offline:
+
+- **Zero-cost hosted request planning (`legends-sa3 large plan`):** Validates `operation` (`text-to-audio`, `audio-to-audio`, or `inpaint`), `duration` (`1..380` seconds, defaulting to `380s` for full songs), `seed`, `steps` (`4..8`), `cfg-scale` (`1..25`), `strength`, and `mask-start`/`mask-end`, and preflights local reference audio with `ffprobe` (`<= 100 MiB`, symlink-refused).
+- **Two-step paid confirmation and crash recovery (`legends-sa3 large generate` and `large result`):** Live hosted jobs require both `--confirmed-live-credits <n>` and `--confirm-paid`. Immediately upon submission, `legends-sa3` writes a secret-free pending receipt containing the remote `generation_id` before polling begins. Paid POST requests are never automatically retried; interrupted downloads resume cleanly via `legends-sa3 large result --generation-id <id>` and verify the downloaded WAV/MP3 bytes and SHA-256 digest before writing.
+- **VRAM-calibrated local Medium planning (`legends-sa3 plan` and `prompt`):** Calculates recommended per-track durations (`90s..120s` on 8 GB VRAM up to `360s..380s` on 24 GB VRAM), crossfade overlap deductions, and exact segment counts on CPU, while formatting structured instrumental metadata (`TrackType`, `VocalType: Instrumental`, BPM, and vocal-blocking negative guidance).
+
+### 2. Complete `legends-sa3` CLI surface
+
+| Surface | `legends-sa3` Subcommands | What It Does |
+| :--- | :--- | :--- |
+| **Readiness & Model Access** | `doctor`, `download-model`, `skill` | Offline hardware/FFmpeg/PyTorch/VRAM inspection (`doctor --offline`), revision-pinned Hugging Face download of gated `stable-audio-3-medium` and `t5gemma` weights after user terms acceptance (`download-model`), and portable recipe bundle validation (`skill validate`, `skill install`). |
+| **Prompt & Runtime Planning** | `prompt`, `plan`, `production-plan` | Expand free-form style notes or built-in recipes (`lofi-study`, `trip-hop-trance`) into structured prompts (`prompt`), compute VRAM-aware local batch geometry (`plan`), or plan full-song hosted production sets with credit estimates (`production-plan`). |
+| **Guarded Hosted Large API** | `large plan`, `large generate`, `large result` | Preview hosted `text-to-audio`, `audio-to-audio`, and `inpaint` payloads offline (`large plan`), execute credit-confirmed jobs with atomic pending receipts (`large generate`), and recover interrupted downloads without double-billing (`large result`). |
+| **Local GPU Batches & LoRA Studio** | `generate`, `lora-studio` | Run resumable local Medium GPU batches with sequential seeds and `.safetensors`-verified LoRA/DoRA checkpoints (`generate`), or manage a commit-pinned (`8a96800a...`) Underfit LoRA training checkout and checksum-verified adapter registry (`lora-studio status`, `install`, `import`, `list-adapters`). |
+| **Active-Cue Analysis & Mastering** | `analyze`, `mix`, `arrange` | Scan generated stems in 100 ms decibel windows to detect near-silent heads/tails and active cues (`analyze`), stream sequential 32-bit float crossfades into a continuous 320 kbps MP3 master (`mix`), or render a per-pair cue sheet into unclipped 32-bit float WAV (`arrange`). |
+
+### 3. SHA-256 stem banking and active-cue loudness mastering (`analyze`, `mix`, and `arrange`)
+
+- **Loudness-scanned dead-air trimming (`--mix-policy active-cue`):** Generative tracks often begin or end with quiet padding that wastes a uniform crossfade window. `legends-sa3 analyze` and `mix` decode each stem into 32-bit floating-point PCM (`512 MiB` bounded), scan peak and RMS decibel thresholds (`--cue-threshold-db -50.0`, `--silence-threshold-db -80.0`), trim silent heads and tails, lock incoming transitions onto active musical cues, and protect the first and final tracks from artificial fades.
+- **Sequential streaming and SHA-256 manifests:** Instead of building one massive FFmpeg filter graph that exhausts RAM across multi-hour mixes, `legends-sa3` streams transitions pair by pair and writes a verified JSON manifest recording source SHA-256 hashes, per-track trims, cue warnings, and `ffprobe`-verified master duration.
+
+## Ad-hoc audio prompts vs `legends-stable-audio-3`
+
+![Comparison: Ad-hoc audio prompts & unseeded runs vs Deterministic audio studio // legends-stable-audio-3](assets/cards/r1/slot-5-adhoc-vs-stable-audio.svg)
+
+<a name="local-medium-quick-start"></a>
+
+## Quick start
 
 ```sh
-legends-sa3 production-plan --minutes 20
-legends-sa3 arrange --plan arrangement.json --output arrangement-float.wav
-```
-
-The plan estimates four full songs, not an exact 20-minute edit. The arrangement
-uses individual cue points and fade lengths for each pair, records every trim,
-preserves full sources by default, and produces a float WAV for mastering.
-See [full-song strategy](docs/large-prompting-guide.md) and
-[cue-sheet format](docs/arrangement.md). Automated checks do not prove creative
-quality; missing listening review remains explicitly unreviewed.
-
-## Legacy active-cue mixing
-
-The `mix` command below retains its compatibility behavior. For complete-song
-sets, prefer `arrange` and individual musical cues instead of a uniform overlap.
-
-## Crossfade Quality Policy
-
-The default `active-cue` mix policy runs per-track cue analysis before rendering:
-
-- Trims generated near-silent dead air at source heads and tails.
-- Trims quiet generated tails that would otherwise waste the overlap window.
-- Keeps the first track from getting an artificial fade-up.
-- Starts incoming tracks at a usable active cue so the overlap is not wasted on
-  a long warmup.
-- Leaves the final track without an artificial fade-down.
-- Writes per-track trims and warnings into the MP3 manifest.
-
-Use `--mix-policy strict` when you want exact raw track boundaries with only the
-linear overlap crossfade. Use `--quality-gate fail` when you want the run to stop
-before rendering if any track has cue-analysis warnings.
-
-## Agent support
-
-`cto-legends` is the only registered skill; this repo vendors a pinned copy at
-`skills/cto-legends/SKILL.md` and registers no per-module skill. The wheel
-ships the operating bundle so agent installation remains available after
-`pip install`.
-
-The installed bundle also carries its own `references/` library: prompt and
-duration tournaments, BPM decisions, SFX and spoken-word-bed practice, exact
-Large REST request/polling flow, paid-action receipts, matched A/B boundaries, long-mix policy, adapter
-escalation, licensing boundaries, and a portable mastery eval.
-
-The agent instructions all route users toward the same safe workflow:
-doctor, model access, prompt planning, generate, optional mix, verify.
-
-After installing the Python package, use the shipped bundle without needing a
-repository checkout:
-
-```powershell
+# 1. Verify local runtime, FFmpeg, and GPU/VRAM readiness offline
+legends-sa3 doctor --offline
 legends-sa3 skill validate
-legends-sa3 skill install --target <skills-directory>
+
+# 2. Preview expanded instrumental prompts and calculate a multi-hour mix plan on CPU
+legends-sa3 prompt --style "trance hip hop jazz, smoky saxophone, broken beat drums, 104 BPM" --count 3
+legends-sa3 plan --hours 4 --vram-gb 24 --crossfade 12
+
+# 3. Preview a hosted Large text-to-audio or audio-to-audio request offline (0 credits spent)
+legends-sa3 large plan \
+  --operation text-to-audio \
+  --prompt "TrackType: Music, VocalType: Instrumental, deep dub techno, 118 BPM" \
+  --duration 380 --seed 42 --steps 8 --cfg-scale 1 --output-format wav
+
+# 4. Run a credit-confirmed hosted job or recover an existing generation ID
+legends-sa3 large generate \
+  --operation text-to-audio \
+  --prompt "TrackType: Music, VocalType: Instrumental, deep dub techno, 118 BPM" \
+  --duration 380 --seed 42 --steps 8 --cfg-scale 1 --output-format wav \
+  --output ./output/dub-techno.wav \
+  --confirmed-live-credits 26 --confirm-paid
+legends-sa3 large result --generation-id <id> --output ./output/dub-techno.wav
+
+# 5. Analyze stems for quiet intros/tails and render an active-cue MP3 or float WAV master
+legends-sa3 analyze --input-dir ./output/tracks_mp3 --json-output ./output/track-analysis.json
+legends-sa3 mix --input-dir ./output/tracks_mp3 --output ./output/master-mix.mp3 --crossfade 12 --mix-policy active-cue
+legends-sa3 production-plan --minutes 20
+legends-sa3 arrange --plan arrangement.json --output ./output/arrangement-float.wav
 ```
 
-The installer requires an explicit parent directory and refuses to replace an
-existing `legends-stable-audio-3` folder. It never guesses or modifies global
-agent locations.
+<a name="documentation"></a>
 
-## Documentation
+## Reference
 
-- [Agent recipe](docs/AGENT-RECIPE.md)
-- [Model access](docs/model-access.md)
-- [Prompting guide](docs/prompting-guide.md)
-- [LoRA adapters](docs/lora-adapters.md)
-- [LoRA Studio with Underfit](docs/lora-studio.md)
-- [VRAM guide](docs/vram-guide.md)
-- [Continuous mix workflow](docs/music-factory.md)
-- [Agent compatibility](docs/agent-compatibility.md)
-- [Windows, Linux, and macOS support](docs/platform-support.md)
-- [Hosted surfaces and receipts](docs/hosted-surfaces-and-receipts.md)
-- [Stable Audio 3 Large REST reference](src/legends_sa3/_bundled_skill/legends-stable-audio-3/references/large-api.md)
-- [Commercial use and license notes](docs/commercial-use-and-license.md)
-- [Apache-2.0 decision and rights record](docs/source-license-decision.md)
-- [Dependency and reproducibility policy](docs/dependency-policy.md)
-- [Troubleshooting](docs/troubleshooting.md)
-- [Release checklist](docs/release-checklist.md)
+<details>
+<summary><strong>Local Medium GPU generation, gated weights, and Underfit LoRA Studio</strong></summary>
 
-## FAQ
+Before running `legends-sa3 download-model`, accept Stability AI's terms for the gated model and bundled T5Gemma conditioner on Hugging Face, then authenticate with `hf auth login`. `legends-stable-audio-3` never bundles, mirrors, or redistributes model weights.
 
-**Does `legends-stable-audio-3` bundle Stability AI model weights?**
-No. You must accept Stability AI's terms on Hugging Face and download `stable-audio-3-medium` yourself, or use your own `STABILITY_API_KEY` for hosted Stable Audio 3 Large REST requests.
+```sh
+# Download gated Medium weights after accepting Hugging Face terms (excludes pickle formats)
+legends-sa3 download-model --model medium --output ./models/stable-audio-3-medium
 
-**Does `legends-sa3 large plan` spend Stability AI platform credits?**
-No. `legends-sa3 large plan` previews the request offline. Paid hosted execution requires both `--confirmed-live-credits <n>` and `--confirm-paid`.
+# Generate a resumable local GPU batch with optional .safetensors LoRA adapter
+legends-sa3 generate \
+  --model-dir ./models/stable-audio-3-medium \
+  --stable-audio-repo ../stable-audio-3 \
+  --style "lo-fi study hip hop, warm Rhodes, soft boom bap drums, no vocals" \
+  --minutes 20 \
+  --vram-gb 24 \
+  --output ./output/lofi-study
 
-## Status
+# Inspect or import a trained .safetensors checkpoint from pinned Underfit LoRA Studio
+legends-sa3 lora-studio status
+legends-sa3 lora-studio import ./state/runs/my-style/5000.safetensors --name my-style --source-run my-style
+legends-sa3 lora-studio list-adapters
+```
 
-Current package version: `v0.1.5`. The project is public and the current release
-is available from [GitHub Releases](https://github.com/avalonreset/legends-stable-audio-3/releases/latest).
+See [first-run guide](docs/first-run.md), [model access](docs/model-access.md), [VRAM guide](docs/vram-guide.md), [prompting guide](docs/prompting-guide.md), [LoRA adapters](docs/lora-adapters.md), and [LoRA Studio with Underfit](docs/lora-studio.md).
 
-Project-owned source, documentation, tests, and the current banner are licensed
-under [Apache License 2.0](LICENSE). `NOTICE`, `THIRD_PARTY_NOTICES.md`, and
-`assets/PROVENANCE.md` document attribution and scope. Models, weights, hosted
-services, datasets, adapters, generated media, and third-party components retain
-their separate terms.
+</details>
 
-legends-stable-audio-3 is an independent compatibility project. It is not
-affiliated with, sponsored by, or endorsed by Stability AI. Stability AI and
-Stable Audio names identify compatible services and models; their marks remain
-with their respective owners.
+<details>
+<summary><strong>Agent setup (via <code>cto-legends</code>) and standalone installation</strong></summary>
 
-Project: [cto-legends.com](https://cto-legends.com) · Source:
-[avalonreset/legends-stable-audio-3](https://github.com/avalonreset/legends-stable-audio-3)
+### Agent setup (via `cto-legends`)
 
----
+Part of [cto-legends](https://github.com/avalonreset/cto-legends). The central router skill is vendored at [skills/cto-legends/SKILL.md](skills/cto-legends/SKILL.md); this module is not a separate registered skill and does not require an ambient MCP daemon.
 
-<p align="center"><a href="https://github.com/stars/avalonreset/lists/cto-legends"><img src="assets/collection-star-shrine.svg" width="100%" alt="GitHub Star List: The complete cto-legends collection on one page. Bookmark or star the router and every module from a single GitHub list."></a></p>
+Run `cto-legends handoff legends-stable-audio-3` and read the returned installed recipe and task-readiness checks. If the module is missing, preview setup with `cto-legends install legends-stable-audio-3`, perform the authorized setup, then repeat the handoff. Use `cto-legends check-updates` to compare your installed version with the catalog and published release. See [docs/AGENT-RECIPE.md](docs/AGENT-RECIPE.md) for the standalone recipe.
+
+```sh
+python -m venv .venv
+python -m pip install -e ".[download]"
+legends-sa3 doctor --offline
+legends-sa3 skill validate
+```
+
+Set `STABILITY_API_KEY` in your environment only when submitting or polling hosted Large API jobs. Secrets are redacted from all receipts and logs.
+
+</details>
+
+<details>
+<summary><strong>Documentation index, verification, and scope boundaries</strong></summary>
+
+- **Guides & references:** [Agent recipe](docs/AGENT-RECIPE.md) · [First run](docs/first-run.md) · [Model access](docs/model-access.md) · [Prompting guide](docs/prompting-guide.md) · [Full-song Large strategy](docs/large-prompting-guide.md) · [Cue-sheet arrangement](docs/arrangement.md) · [Continuous mix workflow](docs/music-factory.md) · [LoRA adapters](docs/lora-adapters.md) · [LoRA Studio](docs/lora-studio.md) · [VRAM guide](docs/vram-guide.md) · [Hosted surfaces and receipts](docs/hosted-surfaces-and-receipts.md) · [Large REST reference](src/legends_sa3/_bundled_skill/legends-stable-audio-3/references/large-api.md) · [Platform support](docs/platform-support.md) · [Agent compatibility](docs/agent-compatibility.md) · [Commercial use and license notes](docs/commercial-use-and-license.md) · [Apache-2.0 source license record](docs/source-license-decision.md) · [Dependency policy](docs/dependency-policy.md) · [Troubleshooting](docs/troubleshooting.md) · [Release checklist](docs/release-checklist.md)
+- **Scope boundaries:** `legends-stable-audio-3` is not a lyric-to-vocal pop song generator (Stable Audio models do not reliably synthesize intelligible sung lyrics; `--allow-vocals` only permits vocal-like ambient textures). It does not bypass Hugging Face gated model terms, and its Apache-2.0 source license covers project-owned code and documentation only (not third-party model weights, datasets, adapters, hosted services, or generated media).
+
+```sh
+python -m pytest tests -v
+python scripts/release_checks.py
+python scripts/check_release.py
+```
+
+</details>
+
+## Contributing, security, and license
+
+See [CONTRIBUTING.md](CONTRIBUTING.md), [SUPPORT.md](SUPPORT.md), and [SECURITY.md](SECURITY.md).
+
+Project-owned source, documentation, tests, and banner assets are licensed under [Apache License 2.0](LICENSE). See [NOTICE](NOTICE), [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md), and [assets/PROVENANCE.md](assets/PROVENANCE.md). `legends-stable-audio-3` is an independent compatibility project and is not affiliated with, sponsored by, or endorsed by Stability AI. Copyright (c) 2026 Avalon Reset.
+
+[![Message Avalon Reset](assets/cards/r1/slot-7-message-avalon-reset.svg)](https://github.com/avalonreset/cto-legends/issues/new?title=Message%20for%20Avalon%20Reset&labels=message)
+
+<p align="center"><a href="https://github.com/stars/avalonreset/lists/cto-legends"><img src="assets/cards/r1/slot-collection-star-shrine.svg" width="100%" alt="GitHub Star List: The complete cto-legends collection on one page. Bookmark or star the router and every module from a single GitHub list."></a></p>
 
 **Specification & benchmarks on cto-legends.com:**
 - **Module specification & architecture matrix:** [cto-legends.com/modules/legends-stable-audio-3](https://cto-legends.com/modules/legends-stable-audio-3)
