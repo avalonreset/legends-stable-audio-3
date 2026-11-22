@@ -1,6 +1,6 @@
 # Legends Stable Audio 3 Agent Recipe
 
-Deterministic operator procedure for `legends-stable-audio-3` (`v0.1.6`). Loaded by `cto-legends handoff legends-stable-audio-3`. Do not register a separate per-module skill.
+Deterministic operator procedure for `legends-stable-audio-3` (`v0.1.7`). Loaded by `cto-legends handoff legends-stable-audio-3`. Do not register a separate per-module skill.
 
 ## 1. Readiness & Diagnostics
 
