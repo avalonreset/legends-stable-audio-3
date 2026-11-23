@@ -26,11 +26,11 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://cto-legends.com"
+Homepage = "https://cto-legends.com/modules/legends-stable-audio-3"
+Documentation = "https://cto-legends.com/modules/legends-stable-audio-3"
 Repository = "https://github.com/avalonreset/legends-stable-audio-3"
 Issues = "https://github.com/avalonreset/legends-stable-audio-3/issues"
 Changelog = "https://github.com/avalonreset/legends-stable-audio-3/blob/main/CHANGELOG.md"
-Documentation = "https://github.com/avalonreset/legends-stable-audio-3#documentation"
 Releases = "https://github.com/avalonreset/legends-stable-audio-3/releases"
 
 [project.optional-dependencies]
